@@ -1,334 +1,281 @@
 # 08. Statistics
 
-> **Syllabus:**
-> - Expectation, variance, higher moments
-> - Probability distributions
-> - Confidence intervals
-> - Descriptive statistics
-> - Hypothesis testing
+> **Official topics (Placement Test guide):** expectation, variance and higher moments; normal distribution and standardization; descriptive statistics; estimators and unbiasedness; confidence intervals; hypothesis tests, p-values; parametric and non-parametric tests.
 >
-> **How to study this file:** Sections 1–7 are 🟢 core: learn them well and redo every worked example.
-> Sections 8–9 are 🟡: read the "Must-know facts" only. Time: about 3–4 hours, plus 1 hour for the MCQs.
-> Probability basics (Bayes, densities, CLT) are in file 07.
+> **Exam:** 7 questions on this topic, 5 options each, about 85 seconds per question. Mostly definitions (α, p-value, unbiased, which test to use) plus short calculations (z-score, CI, sample variance).
+>
+> **How to study this file:** every section is 🟢 (all are on the official list). Learn the definitions and the "which test when" table, then redo the worked examples. Time: about 4 hours + 1 hour MCQs.
+>
+> *Removed (not on the official list, or covered elsewhere):* the distribution summary table (→ [07-measure-and-probability.md](07-measure-and-probability.md), section 8), the regression-line formula (one line kept). Correlation is now part of descriptive statistics; MLE is now part of estimators.
 
 ## Contents
 1. [Descriptive statistics](#1-descriptive-statistics-) 🟢
 2. [Expectation, variance, higher moments](#2-expectation-variance-higher-moments-) 🟢
-3. [Probability distributions (summary)](#3-probability-distributions-summary-) 🟢
-4. [The normal distribution and the z-table](#4-the-normal-distribution-and-the-z-table-) 🟢
-5. [Estimators and the standard error](#5-estimators-and-the-standard-error-) 🟢
-6. [Confidence interval for a mean](#6-confidence-interval-for-a-mean-) 🟢
-7. [Hypothesis testing: z-test, t-test, p-value, errors](#7-hypothesis-testing-) 🟢
-8. [Correlation and regression](#8-correlation-and-regression-) 🟡
-9. [Chi-square, t and F distributions; MLE](#9-chi-square-t-and-f-distributions-mle-) 🟡
-10. [Formula sheet](#formula-sheet)
-11. [Practice MCQs](#practice-mcqs)
+3. [The normal distribution and standardization](#3-the-normal-distribution-and-standardization-) 🟢
+4. [Estimators and unbiasedness](#4-estimators-and-unbiasedness-) 🟢
+5. [Confidence intervals](#5-confidence-intervals-) 🟢
+6. [Hypothesis tests and p-values](#6-hypothesis-tests-and-p-values-) 🟢
+7. [Parametric tests](#7-parametric-tests-) 🟢
+8. [Non-parametric tests](#8-non-parametric-tests-) 🟢
+9. [Formula sheet](#formula-sheet)
+10. [Practice MCQs](#practice-mcqs) (32 questions, 5 options)
 
-**Symbols used in this file**
-
-| Symbol | Meaning |
-|---|---|
-| $x_1,\dots,x_n$ | the data (a sample of size $n$) |
-| $\bar x$ | sample mean |
-| $s^2$, $s$ | sample variance, sample standard deviation |
-| $\mu$, $\sigma$ | true (population) mean and standard deviation — usually unknown |
-| $H_0$, $H_1$ | null hypothesis, alternative hypothesis |
-| $\alpha$ | significance level (for example $0.05$) |
-| $\Phi(z)$ | $P(Z\le z)$ for a standard normal $Z\sim N(0,1)$ |
+**Symbols:** data $x_1,\dots,x_n$; sample mean $\bar x$; sample variance $s^2$; population mean / SD $\mu,\sigma$; hypotheses $H_0,H_1$; significance level $\alpha$; $\Phi(z)=P(Z\le z)$ for $Z\sim N(0,1)$.
 
 ---
 
 ## 1. Descriptive statistics 🟢
 
-**Meaning.** Descriptive statistics are simple numbers that summarise data: a "centre" and a "spread".
-
-**Centre.**
-
-| Measure | How to compute | Robust to outliers? |
+**Centre**
+| Measure | How | Robust to outliers? |
 |---|---|---|
-| Mean $\bar x$ | $\frac1n\sum x_i$ | no |
-| Median | sort the data; take the middle value (for even $n$: average of the two middle values) | yes |
-| Mode | the most frequent value | — |
+| mean $\bar x$ | $\frac1n\sum x_i$ | no |
+| median | middle of the sorted data (even $n$: average of the two middle values) | yes |
+| mode | most frequent value | — |
 
-**Spread.**
-
+**Spread**
 | Measure | Formula |
 |---|---|
-| Range | max − min |
-| Sample variance | $s^2=\frac{1}{n-1}\sum_{i=1}^n(x_i-\bar x)^2$ |
-| Sample SD | $s=\sqrt{s^2}$ |
-| Quartiles | $Q_1$ = median of the lower half, $Q_3$ = median of the upper half |
-| IQR (interquartile range) | $Q_3-Q_1$ |
+| range | max − min |
+| sample variance | $s^2=\frac1{n-1}\sum(x_i-\bar x)^2$ |
+| sample SD | $s=\sqrt{s^2}$ |
+| quartiles, IQR | $Q_1,Q_3$ = medians of lower/upper half; $IQR=Q_3-Q_1$ |
+| MAD | median of $\lvert x_i-\text{median}\rvert$ (robust) |
 
-**Outliers (boxplot rule).** A value is an outlier if it is below $Q_1-1.5\cdot IQR$ or above $Q_3+1.5\cdot IQR$.
-A **boxplot** shows min, $Q_1$, median, $Q_3$, max (the "five-number summary").
+**Outliers (boxplot rule):** below $Q_1-1.5\,IQR$ or above $Q_3+1.5\,IQR$. A **boxplot** shows the five-number summary (min, $Q_1$, median, $Q_3$, max).
 
-**Worked example.** Data: $2,4,4,4,5,5,7,9$ ($n=8$).
-1. Mean: $\frac{2+4+4+4+5+5+7+9}{8}=\frac{40}{8}=5$.
-2. Median: the two middle values are $4$ and $5$, so median $=4.5$.
-3. Mode: $4$ (appears 3 times).
-4. Deviations squared: $9,1,1,1,0,0,4,16$; sum $=32$.
-5. $s^2=\frac{32}{7}\approx4.57$, $s\approx2.14$. (Dividing by $n=8$ gives $4$, the "population variance".)
+**Worked example.** $2,4,4,4,5,5,7,9$.
+1. Mean $\frac{40}8=5$; median $\frac{4+5}2=4.5$; mode $4$.
+2. Squared deviations $9,1,1,1,0,0,4,16$, sum $32$.
+3. $s^2=\frac{32}7\approx4.57$ (dividing by $n$ would give $4$).
 
-**Worked example (outliers).** $Q_1=20$, $Q_3=30$. Then $IQR=10$, and the fences are $20-15=5$ and $30+15=45$. A value $47$ is an outlier; $44$ is not.
+**Shape:** symmetric ⇒ mean ≈ median; right-skewed (long right tail, incomes) ⇒ mean > median; left-skewed ⇒ mean < median.
 
-**Shape.**
-- Symmetric data: mean ≈ median.
-- **Right-skewed** (long tail to the right, e.g. incomes): mean > median.
-- Left-skewed: mean < median.
+**Linear change** $y_i=ax_i+b$: $\bar y=a\bar x+b$, $s_y=\lvert a\rvert s_x$; median and quartiles transform the same way.
 
-**Linear change of data** $y_i=ax_i+b$: $\bar y=a\bar x+b$, $s_y=\lvert a\rvert s_x$. Adding a constant changes the mean, **not** the SD.
+**Two variables: correlation.**
+$$r=\frac{\sum(x_i-\bar x)(y_i-\bar y)}{\sqrt{\sum(x_i-\bar x)^2\sum(y_i-\bar y)^2}}\in[-1,1].$$
+$r=\pm1$: points on a line; $r=0$: no **linear** relation (e.g. $y=x^2$ on symmetric data). $r$ has no units; correlation ≠ causation. Least-squares line goes through $(\bar x,\bar y)$ with slope $r\frac{s_y}{s_x}$.
 
-> **Trap:** the sample variance divides by $n-1$, not $n$. And one big outlier changes the mean a lot, but the median almost not at all.
+> **Trap:** sample variance divides by $n-1$. One outlier moves the mean a lot but the median hardly at all.
 
 ---
 
 ## 2. Expectation, variance, higher moments 🟢
 
-**Meaning.** These are the "population versions" of the mean and variance (see file 07, Section 7).
-
 | Quantity | Formula | Meaning |
 |---|---|---|
-| Mean | $\mu=E[X]$ | centre |
-| Variance | $\sigma^2=E[(X-\mu)^2]=E[X^2]-\mu^2$ | spread |
-| $k$-th moment | $E[X^k]$ | |
+| mean | $\mu=E[X]$ | centre |
+| variance | $\sigma^2=E[(X-\mu)^2]=E[X^2]-\mu^2$ | spread |
+| $k$-th (raw) moment | $E[X^k]$ | |
 | $k$-th central moment | $E[(X-\mu)^k]$ | |
-| Skewness | $\frac{E[(X-\mu)^3]}{\sigma^3}$ | asymmetry |
-| Kurtosis | $\frac{E[(X-\mu)^4]}{\sigma^4}$ | heavy tails |
+| **skewness** | $\gamma_1=\frac{E[(X-\mu)^3]}{\sigma^3}$ | asymmetry |
+| **kurtosis** | $\frac{E[(X-\mu)^4]}{\sigma^4}$ | tail weight |
 
-**Rules.** $E[aX+b]=a\mu+b$, $\operatorname{Var}(aX+b)=a^2\sigma^2$, $\operatorname{SD}(aX+b)=\lvert a\rvert\sigma$.
+**Rules:** $E[aX+b]=a\mu+b$, $\operatorname{Var}(aX+b)=a^2\sigma^2$. Shifting changes only the mean; skewness and kurtosis do not change under $aX+b$ with $a>0$ (skewness flips sign for $a<0$).
 
-**Worked example.** $P(X=0)=0.5$, $P(X=1)=0.3$, $P(X=2)=0.2$.
-1. $E[X]=0\cdot0.5+1\cdot0.3+2\cdot0.2=0.7$.
-2. $E[X^2]=0+1\cdot0.3+4\cdot0.2=1.1$.
-3. $\operatorname{Var}X=1.1-0.7^2=1.1-0.49=0.61$.
+> **Must-know facts**
+> 1. Symmetric distribution ⇒ all odd central moments are $0$ (skewness $0$).
+> 2. Normal: skewness $0$, kurtosis $3$ (**excess kurtosis** = kurtosis − 3 = $0$). Heavy tails: excess kurtosis $>0$.
+> 3. Exponential: skewness $2$ (right-skewed).
+> 4. Moments may not exist: Cauchy has no mean; $t_2$ has no variance.
+> 5. Sample versions: $\frac1n\sum(x_i-\bar x)^3/s^3$ etc.
 
-> **Must-know facts (higher moments) 🟡**
-> - Skewness $>0$: long right tail. Skewness $<0$: long left tail. Symmetric distribution: skewness $0$.
-> - Normal distribution: skewness $0$, kurtosis $3$ ("excess kurtosis" $=3-3=0$).
-> - Exponential distribution: skewness $2$ (right-skewed).
-> - Adding a constant does not change variance, skewness or kurtosis.
+**Worked example.** $P(X=0)=0.5$, $P(X=1)=0.3$, $P(X=2)=0.2$: $E[X]=0.7$, $E[X^2]=1.1$, $\operatorname{Var}=1.1-0.49=0.61$.
 
-> **Trap:** $E[X^2]$ is **not** $(E[X])^2$. Their difference is exactly the variance.
+> **Trap:** $E[X^2]\ne(E[X])^2$; the difference is the variance.
 
 ---
 
-## 3. Probability distributions (summary) 🟢
+## 3. The normal distribution and standardization 🟢
 
-Here $q=1-p$. The full explanation is in file 07, Section 8.
+$X\sim N(\mu,\sigma^2)$: density $\frac1{\sigma\sqrt{2\pi}}e^{-(x-\mu)^2/(2\sigma^2)}$, symmetric bell around $\mu$. **Fully determined by mean and variance** (official example 1).
 
-| Name | Mean | Variance | Remember |
-|---|---|---|---|
-| Bernoulli$(p)$ | $p$ | $pq$ | one yes/no trial |
-| Binomial$(n,p)$ | $np$ | $npq$ | $P(X=k)=\binom nkp^kq^{n-k}$ |
-| Geometric$(p)$ (trials until 1st success) | $\frac1p$ | $\frac q{p^2}$ | memoryless (discrete) |
-| Poisson$(\lambda)$ | $\lambda$ | $\lambda$ | mean = variance |
-| Uniform$[a,b]$ | $\frac{a+b}2$ | $\frac{(b-a)^2}{12}$ | |
-| Exponential$(\lambda)$ | $\frac1\lambda$ | $\frac1{\lambda^2}$ | $P(X>t)=e^{-\lambda t}$, memoryless |
-| Normal $N(\mu,\sigma^2)$ | $\mu$ | $\sigma^2$ | bell curve, symmetric |
-
-**Worked example.** $X\sim U[2,8]$. Mean $=\frac{2+8}2=5$. Variance $=\frac{(8-2)^2}{12}=\frac{36}{12}=3$.
-
-**Worked example.** $X\sim\text{Bin}(10,0.3)$. Mean $=3$, variance $=10\cdot0.3\cdot0.7=2.1$.
-
-**Worked example (Poisson approximation).** 1000 items, each defective with probability $0.002$. Then $X\approx\text{Poisson}(\lambda=np=2)$, and $P(X=0)\approx e^{-2}\approx0.135$.
-
-**Memoryless.** For the exponential: $P(X>s+t\mid X>s)=P(X>t)$. "An old light bulb is as good as a new one." The exponential is the only continuous memoryless distribution; the geometric is the only discrete one.
-
-> **Trap:** for Poisson, mean **=** variance. For Binomial, variance $npq$ is **smaller** than the mean $np$.
-
----
-
-## 4. The normal distribution and the z-table 🟢
-
-**Meaning.** $N(\mu,\sigma^2)$ is the bell curve with centre $\mu$ and spread $\sigma$. To use the table, change $X$ to the **standard normal** $Z\sim N(0,1)$.
-
-**Formula (standardize).**
-$$Z=\frac{X-\mu}{\sigma},\qquad P(X\le x)=\Phi\!\left(\frac{x-\mu}{\sigma}\right),\qquad \Phi(-z)=1-\Phi(z)$$
-
-**z-table.**
+**Standardization**
+$$Z=\frac{X-\mu}\sigma\sim N(0,1),\qquad P(X\le x)=\Phi\!\left(\frac{x-\mu}\sigma\right),\qquad\Phi(-z)=1-\Phi(z).$$
+For data: the **z-score** $z_i=\frac{x_i-\bar x}{s}$ says how many SDs a value is from the mean.
 
 | $z$ | 0 | 0.5 | 1 | 1.28 | 1.5 | 1.645 | 1.96 | 2 | 2.326 | 2.576 | 3 |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | $\Phi(z)$ | 0.5 | 0.6915 | 0.8413 | 0.90 | 0.9332 | 0.95 | 0.975 | 0.9772 | 0.99 | 0.995 | 0.9987 |
 
-**Critical values (learn these three!)**
+**Critical values:** $1.645$ (90% two-sided / 5% one-sided), $1.96$ (95% / 2.5%), $2.576$ (99% / 0.5%).
+**68–95–99.7 rule:** within $1\sigma,2\sigma,3\sigma$.
 
-| Value | Two-sided level | One-sided level |
-|---|---|---|
-| $1.645$ | 90% CI / $\alpha=0.10$ | $\alpha=0.05$ |
-| $1.96$ | 95% CI / $\alpha=0.05$ | $\alpha=0.025$ |
-| $2.576$ | 99% CI / $\alpha=0.01$ | $\alpha=0.005$ |
+> **Must-know facts**
+> 1. $aX+b\sim N(a\mu+b,a^2\sigma^2)$.
+> 2. Independent normals: $X+Y\sim N(\mu_1+\mu_2,\sigma_1^2+\sigma_2^2)$; $\bar X\sim N(\mu,\frac{\sigma^2}n)$ exactly.
+> 3. Mean = median = mode; inflection points at $\mu\pm\sigma$.
+> 4. Normality can be checked with a Q–Q plot or a test (Shapiro–Wilk, Kolmogorov–Smirnov).
 
-**68–95–99.7 rule:** $P(\lvert Z\rvert\le1)\approx0.68$, $P(\lvert Z\rvert\le2)\approx0.95$, $P(\lvert Z\rvert\le3)\approx0.997$.
+**Worked examples.**
+- IQ $\sim N(100,15^2)$: $P(>130)=1-\Phi(2)=0.0228$.
+- $X\sim N(50,16)$: $\sigma=4$, $P(46<X<54)=2\Phi(1)-1=0.6826$.
 
-**Worked example.** IQ $\sim N(100,15^2)$. $P(\text{IQ}>130)$?
-1. $z=\frac{130-100}{15}=2$.
-2. $P=1-\Phi(2)=1-0.9772=0.0228$.
-
-**Worked example 2.** $X\sim N(50,4^2)$. $P(46<X<54)$?
-1. $z$-values: $\frac{46-50}{4}=-1$ and $\frac{54-50}4=1$.
-2. $P=\Phi(1)-\Phi(-1)=2\cdot0.8413-1=0.6826$.
-
-**Sum of independent normals** is normal: $N(\mu_1,\sigma_1^2)+N(\mu_2,\sigma_2^2)=N(\mu_1+\mu_2,\ \sigma_1^2+\sigma_2^2)$.
-
-> **Trap:** $N(\mu,\sigma^2)$ uses the **variance** as second number. $N(100,225)$ means $\sigma=15$, not $225$.
+> **Trap:** $N(100,225)$ means $\sigma=15$ — the second parameter is the **variance**.
 
 ---
 
-## 5. Estimators and the standard error 🟢
+## 4. Estimators and unbiasedness 🟢
 
-**Meaning.** We do not know $\mu$ or $\sigma$. We **estimate** them from the data. An estimator is a formula using the data, e.g. $\bar x$.
+An **estimator** $\hat\theta=T(X_1,\dots,X_n)$ is a function of the sample used to guess a parameter $\theta$. It is itself a random variable.
 
-**Key ideas.**
-- **Unbiased:** the estimator is correct "on average": $E[\hat\theta]=\theta$.
-- $\bar X$ is unbiased for $\mu$.
-- $S^2=\frac1{n-1}\sum(X_i-\bar X)^2$ is unbiased for $\sigma^2$. **This is why we divide by $n-1$.**
-- With $n$ in the denominator, the estimator is a bit too small on average: $E=\frac{n-1}{n}\sigma^2$.
+| Property | Definition |
+|---|---|
+| **unbiased** | $E[\hat\theta]=\theta$ for every $\theta$ |
+| bias | $b(\hat\theta)=E[\hat\theta]-\theta$ |
+| asymptotically unbiased | $E[\hat\theta_n]\to\theta$ |
+| **mean squared error** | $MSE=E[(\hat\theta-\theta)^2]=\operatorname{Var}(\hat\theta)+b^2$ |
+| **consistent** | $\hat\theta_n\to\theta$ in probability as $n\to\infty$ |
+| more **efficient** | smaller variance among unbiased estimators |
 
-**Standard error (SE)** = standard deviation of $\bar X$:
-$$SE=\frac{\sigma}{\sqrt n}\quad(\text{or }\frac{s}{\sqrt n}\text{ if }\sigma\text{ is unknown})$$
+**Standard results**
+- $\bar X$ is unbiased for $\mu$, $\operatorname{Var}\bar X=\frac{\sigma^2}n$, consistent (LLN).
+- $S^2=\frac1{n-1}\sum(X_i-\bar X)^2$ is **unbiased** for $\sigma^2$. With $\frac1n$: $E=\frac{n-1}n\sigma^2$ (biased, too small). This is why we divide by $n-1$ (Bessel's correction).
+- $S=\sqrt{S^2}$ is **not** unbiased for $\sigma$ (Jensen).
+- Unbiased + variance $\to0$ ⇒ consistent.
+- **Cramér–Rao:** the variance of an unbiased estimator is at least $\frac1{nI(\theta)}$ (Fisher information).
 
-**Worked example.** $\sigma=10$, $n=100$: $SE=\frac{10}{\sqrt{100}}=1$. With $n=400$: $SE=\frac{10}{20}=0.5$.
-So **4 times more data gives half the SE.**
+**Standard error:** $SE=\frac\sigma{\sqrt n}$ (or $\frac s{\sqrt n}$). 4× data ⇒ half the SE.
 
-> **Trap:** the SE gets smaller with $\sqrt n$, not with $n$. Doubling $n$ does **not** halve the SE.
+### How to construct estimators
+- **Method of moments:** set sample moments equal to theoretical moments.
+- **Maximum likelihood (MLE):** maximize $L(\theta)=\prod f(x_i;\theta)$ (usually $\log L$).
+
+| Model | MLE |
+|---|---|
+| Bernoulli$(p)$ | $\hat p=\bar x$ |
+| Poisson$(\lambda)$ | $\hat\lambda=\bar x$ |
+| Exponential$(\lambda)$ | $\hat\lambda=\frac1{\bar x}$ |
+| $N(\mu,\sigma^2)$ | $\hat\mu=\bar x$, $\hat\sigma^2=\frac1n\sum(x_i-\bar x)^2$ (biased!) |
+| $U[0,\theta]$ | $\hat\theta=\max x_i$ (biased: $E=\frac n{n+1}\theta$) |
+
+**Worked example (MLE, exponential).**
+1. $\log L=n\log\lambda-\lambda\sum x_i$.
+2. Derivative: $\frac n\lambda-\sum x_i=0$.
+3. $\hat\lambda=\frac n{\sum x_i}=\frac1{\bar x}$.
+
+**Worked example ($U[0,\theta]$).** Method of moments: $E[X]=\frac\theta2$ ⇒ $\hat\theta=2\bar X$ (unbiased). MLE $\max X_i$ is always $\le\theta$, so it underestimates; $\frac{n+1}n\max X_i$ is unbiased.
+
+> **Trap:** unbiased does not mean "good": an unbiased estimator can have a huge variance; a slightly biased one can have smaller MSE.
 
 ---
 
-## 6. Confidence interval for a mean 🟢
+## 5. Confidence intervals 🟢
 
-**Meaning.** A confidence interval (CI) is a range of plausible values for the unknown mean $\mu$. A 95% CI is made by a method that catches the true $\mu$ in 95% of repeated samples.
-
-**Formulas.**
+A $(1-\alpha)$ **confidence interval** is a random interval that contains the true parameter with probability $1-\alpha$ **before** the data are seen.
 
 | Case | CI at level $1-\alpha$ |
 |---|---|
-| $\sigma$ known (or $n$ large) | $\bar x\pm z\cdot\frac{\sigma}{\sqrt n}$ with $z=1.645$ (90%), $1.96$ (95%), $2.576$ (99%) |
-| $\sigma$ unknown, normal data | $\bar x\pm t_{n-1}\cdot\frac{s}{\sqrt n}$, $t$-value with $n-1$ degrees of freedom |
-| Proportion (large $n$) | $\hat p\pm z\sqrt{\frac{\hat p(1-\hat p)}{n}}$ |
+| mean, $\sigma$ known (or $n$ large) | $\bar x\pm z_{1-\alpha/2}\frac\sigma{\sqrt n}$ |
+| mean, $\sigma$ unknown, normal data | $\bar x\pm t_{n-1,1-\alpha/2}\frac s{\sqrt n}$ |
+| proportion (large $n$) | $\hat p\pm z\sqrt{\frac{\hat p(1-\hat p)}n}$ |
+| variance, normal data | $\left[\frac{(n-1)s^2}{\chi^2_{n-1,1-\alpha/2}},\ \frac{(n-1)s^2}{\chi^2_{n-1,\alpha/2}}\right]$ |
 
-The part after $\pm$ is the **margin of error** $E$. The width is $2E$.
-
-**Worked example ($z$-interval).** $\bar x=50$, $\sigma=10$, $n=100$, 95%.
-1. $SE=\frac{10}{\sqrt{100}}=1$.
-2. Margin $=1.96\cdot1=1.96$.
-3. CI $=[50-1.96,\ 50+1.96]=[48.04,\ 51.96]$.
-
-**Worked example ($t$-interval).** $n=16$, $\bar x=20$, $s=4$, 95%, $\sigma$ unknown.
-1. $SE=\frac{4}{\sqrt{16}}=1$.
-2. Degrees of freedom $=15$, $t_{15}=2.131$ (from a $t$-table).
-3. CI $=20\pm2.131=[17.869,\ 22.131]$.
-
-**Some $t$-values** (95%, two-sided): df 5: 2.571; df 9: 2.262; df 15: 2.131; df 29: 2.045; df $\infty$: 1.96.
-
-**What makes the CI wider?**
+**$z$-example.** $\bar x=50$, $\sigma=10$, $n=100$, 95%: $SE=1$, CI $=[48.04,\ 51.96]$.
+**$t$-example.** $n=16$, $\bar x=20$, $s=4$, 95%: $SE=1$, $t_{15}=2.131$, CI $=[17.869,\ 22.131]$.
+$t$-values (95%, two-sided): df 5: 2.571; 9: 2.262; 15: 2.131; 29: 2.045; $\infty$: 1.96.
 
 | Change | Width |
 |---|---|
-| higher confidence (95% → 99%) | wider |
+| higher confidence | wider |
 | larger $\sigma$ | wider |
-| larger $n$ | narrower ($\propto\frac1{\sqrt n}$) |
-| $t$ instead of $z$ (small $n$) | wider |
+| larger $n$ | narrower, $\propto\frac1{\sqrt n}$ |
+| $t$ instead of $z$ | wider |
 
-**Sample size.** For margin $E$: $n=\left(\frac{z\,\sigma}{E}\right)^2$, round **up**.
-Example: $\sigma=10$, $E=2$, 95%: $n=\left(\frac{1.96\cdot10}{2}\right)^2=96.04$, so $n=97$.
+**Sample size:** $n=\left(\frac{z\sigma}E\right)^2$ rounded **up** ($\sigma=10$, $E=2$, 95% ⇒ $97$).
 
-**Correct interpretation.** "If we repeat the sampling many times, about 95% of the intervals contain $\mu$."
-Wrong: "95% of the data lie in the CI." Wrong: "$\mu$ changes randomly."
+**Interpretation.** "In repeated sampling, 95% of such intervals contain $\mu$." Not: "$\mu$ is in this interval with probability 95%" ($\mu$ is fixed), not "95% of the data lie in it".
 
-> **Trap:** to make the CI **half** as wide you need **4 times** the sample size, not 2 times.
+> **Trap:** half the width needs **4×** the sample size.
 
 ---
 
-## 7. Hypothesis testing 🟢
+## 6. Hypothesis tests and p-values 🟢
 
-**Meaning.** We have a claim $H_0$ (for example "$\mu=50$"). We check if the data are very unlikely when $H_0$ is true. If yes, we **reject** $H_0$.
-
-### 7.1 The steps
-1. Write $H_0$ (with "=") and $H_1$ (what we want to show).
-   - two-sided: $H_1:\mu\neq\mu_0$; one-sided: $H_1:\mu>\mu_0$ or $\mu<\mu_0$.
-2. Choose $\alpha$ (usually $0.05$).
+**Steps**
+1. $H_0$ (with "="), $H_1$ (two-sided $\mu\ne\mu_0$ or one-sided $\mu>\mu_0$ / $\mu<\mu_0$).
+2. Choose $\alpha$ (e.g. $0.05$) **before** looking at the data.
 3. Compute the test statistic.
-4. Compare with the critical value (or compare the p-value with $\alpha$).
-5. Decide: reject $H_0$ or "do not reject $H_0$".
+4. Compare with the critical value, or the p-value with $\alpha$.
+5. Reject $H_0$, or "do not reject $H_0$".
 
-### 7.2 Test statistics
+**p-value** = probability, **under $H_0$**, of a test statistic at least as extreme as the observed one. Reject $H_0$ ⇔ $p\le\alpha$.
+Two-sided $z$: $p=2(1-\Phi(\lvert z\rvert))$; one-sided: $p=1-\Phi(z)$.
+
+**Errors (official example 2)**
+| | $H_0$ true | $H_0$ false |
+|---|---|---|
+| reject $H_0$ | **type I error**, probability $\alpha$ | correct, probability = **power** $1-\beta$ |
+| do not reject | correct, probability $1-\alpha$ | **type II error**, probability $\beta$ |
+
+$\alpha$ = significance level = $P(\text{reject }H_0\mid H_0\text{ true})$.
+Power grows with larger $n$, larger effect, smaller $\sigma$, larger $\alpha$. Smaller $\alpha$ (same $n$) ⇒ larger $\beta$.
+
+**CI–test duality:** a two-sided level-$\alpha$ test rejects $H_0:\mu=\mu_0$ ⇔ $\mu_0$ is outside the $(1-\alpha)$ CI.
+
+**Worked example.** $H_0:\mu=50$, $\sigma=8$, $n=64$, $\bar x=52$: $SE=1$, $z=2$. Reject at 5% ($2>1.96$), not at 1% ($2<2.576$); $p\approx0.046$.
+
+**Multiple testing:** with $m$ tests at level $\alpha$, false positives pile up; **Bonferroni** uses $\frac\alpha m$ per test.
+
+> **Trap:** the p-value is **not** $P(H_0\text{ true})$; not rejecting $H_0$ does not prove $H_0$; $\alpha+\beta\ne1$ in general.
+
+---
+
+## 7. Parametric tests 🟢
+
+**Parametric** = assumes a distribution family (usually normal) and tests its parameters.
 
 | Test | Statistic | Use when |
 |---|---|---|
-| $z$-test | $z=\dfrac{\bar x-\mu_0}{\sigma/\sqrt n}$ | $\sigma$ known |
-| $t$-test | $t=\dfrac{\bar x-\mu_0}{s/\sqrt n}$, df $=n-1$ | $\sigma$ unknown |
-| paired $t$-test | same as $t$-test on the differences $d_i$ | before/after on the same people |
+| one-sample $z$-test | $\frac{\bar x-\mu_0}{\sigma/\sqrt n}$ | $\sigma$ known (or large $n$) |
+| one-sample $t$-test | $\frac{\bar x-\mu_0}{s/\sqrt n}$, df $n-1$ | normal data, $\sigma$ unknown |
+| paired $t$-test | $t$-test on differences $d_i$ | before/after on the same units |
+| two-sample $t$-test | $\frac{\bar x_1-\bar x_2}{s_p\sqrt{1/n_1+1/n_2}}$, df $n_1+n_2-2$ | two independent normal samples, equal variances (Welch if unequal) |
+| $F$-test | $\frac{s_1^2}{s_2^2}$ | compare two variances (normal data) |
+| one-way ANOVA | $F$ = between / within variance | $\ge3$ group means |
+| $\chi^2$ variance test | $\frac{(n-1)s^2}{\sigma_0^2}$, df $n-1$ | one variance |
 
-**Reject $H_0$** (two-sided, $\alpha=0.05$) if $\lvert z\rvert>1.96$. One-sided ($H_1:\mu>\mu_0$, $\alpha=0.05$): reject if $z>1.645$.
+**$\chi^2$ tests for counts** (large-sample, often listed with non-parametric tests): $\sum\frac{(O-E)^2}{E}$; goodness of fit df $=k-1$ (minus estimated parameters), independence in $r\times c$ table df $=(r-1)(c-1)$.
 
-**Worked example.** $H_0:\mu=50$, $H_1:\mu\neq50$, $\sigma=8$, $n=64$, $\bar x=52$.
-1. $SE=\frac{8}{\sqrt{64}}=1$.
-2. $z=\frac{52-50}{1}=2$.
-3. $\alpha=0.05$: $\lvert z\rvert=2>1.96$, so **reject** $H_0$.
-4. $\alpha=0.01$: $2<2.576$, so **do not reject**.
-5. p-value $=2(1-\Phi(2))=2\cdot0.0228\approx0.046$.
+**Distributions:** $t_\nu$ symmetric with heavier tails than $N(0,1)$, $\to N(0,1)$ as $\nu\to\infty$; $\chi^2_k$ = sum of $k$ squared standard normals, mean $k$, variance $2k$; $F$ = ratio of scaled $\chi^2$.
 
-### 7.3 The p-value
-**Meaning.** The p-value is the probability, **if $H_0$ is true**, of getting a result at least as extreme as the one we observed.
+> **Trap:** the $t$-test assumes (approximately) normal data; for small, skewed samples or outliers use a non-parametric test.
 
-- Small p-value = strong evidence against $H_0$.
-- **Rule:** reject $H_0$ if $p\le\alpha$.
-- Two-sided $z$-test: $p=2\,(1-\Phi(\lvert z\rvert))$. One-sided: $p=1-\Phi(z)$.
+---
 
-**Worked example.** $p=0.03$: reject at $\alpha=0.05$ (since $0.03\le0.05$); do not reject at $\alpha=0.01$.
+## 8. Non-parametric tests 🟢
 
-> **Trap:** the p-value is **not** "the probability that $H_0$ is true". And "not rejecting $H_0$" does **not** prove $H_0$.
+**Non-parametric (distribution-free)** = no assumption of a specific distribution family. Most use **signs** or **ranks** instead of the raw values.
 
-### 7.4 Type I and type II errors
+| Pros | Cons |
+|---|---|
+| valid for any continuous distribution, small samples, ordinal data | less **power** than the parametric test when its assumptions (normality) really hold |
+| robust to outliers | tests medians / location shifts rather than means |
 
-|  | $H_0$ is true | $H_0$ is false |
+### Which test when
+| Situation | Parametric | Non-parametric |
 |---|---|---|
-| Reject $H_0$ | **Type I error** (probability $\alpha$) | correct (probability = **power** $=1-\beta$) |
-| Do not reject $H_0$ | correct | **Type II error** (probability $\beta$) |
+| one sample (or paired differences), location | one-sample / paired $t$ | **sign test**, **Wilcoxon signed-rank test** |
+| two independent samples | two-sample $t$ | **Mann–Whitney U** (= Wilcoxon rank-sum) |
+| $\ge3$ independent groups | one-way ANOVA | **Kruskal–Wallis** |
+| association of two variables | Pearson correlation | **Spearman** rank correlation (monotone relations) |
+| fit to a given distribution | — | **Kolmogorov–Smirnov**, $\chi^2$ goodness of fit |
+| independence of categories | — | $\chi^2$ test of independence, Fisher's exact test |
 
-Memory help (court): $H_0$ = "innocent". Type I = an innocent person goes to prison. Type II = a guilty person goes free.
+### How they work
+- **Sign test:** count positive differences $S$. Under $H_0$ (median difference $0$): $S\sim\text{Bin}(n,\frac12)$.
+- **Wilcoxon signed-rank:** rank $\lvert d_i\rvert$, sum the ranks of the positive differences. Uses magnitude too ⇒ more power than the sign test; assumes symmetry.
+- **Mann–Whitney U:** rank all observations together; compare rank sums of the two groups. $U\in[0,n_1n_2]$, mean $\frac{n_1n_2}2$ under $H_0$.
+- **Spearman $\rho$:** Pearson correlation of the ranks; $\rho=1$ for every strictly increasing relation (also nonlinear).
+- **Kolmogorov–Smirnov:** largest distance $\sup_x\lvert F_n(x)-F_0(x)\rvert$ between empirical and hypothesized CDF.
 
-**Power** $=1-\beta=P(\text{reject }H_0\mid H_0\text{ false})$. Power gets **bigger** when:
-- $n$ is bigger,
-- the true effect is bigger,
-- $\sigma$ is smaller,
-- $\alpha$ is bigger.
+**Worked example (sign test).** 10 patients, blood pressure lower after treatment in 9 cases. $H_0$: no effect.
+1. Under $H_0$: $S\sim\text{Bin}(10,\frac12)$.
+2. One-sided $p=P(S\ge9)=\frac{\binom{10}9+\binom{10}{10}}{2^{10}}=\frac{11}{1024}\approx0.011$.
+3. Reject $H_0$ at $\alpha=0.05$ (two-sided $p\approx0.021$, still $<0.05$).
 
-If you make $\alpha$ smaller (with the same $n$), then $\beta$ gets bigger. There is a trade-off.
-
-### 7.5 CI and test are connected
-A two-sided test at level $\alpha$ rejects $H_0:\mu=\mu_0$ **exactly when** $\mu_0$ is **outside** the $(1-\alpha)$ CI.
-Example: 95% CI $=[12.1,\ 15.3]$. Test $\mu_0=16$ at 5%: reject. Test $\mu_0=14$: do not reject.
-
-> **Trap:** $\alpha$ is the probability of a type I error, chosen **before** the test. $\alpha+\beta$ is in general **not** 1.
-
----
-
-## 8. Correlation and regression 🟡
-
-**Short idea.** The correlation $r$ measures how close the points $(x_i,y_i)$ are to a straight line.
-$$r=\frac{\sum(x_i-\bar x)(y_i-\bar y)}{\sqrt{\sum(x_i-\bar x)^2\,\sum(y_i-\bar y)^2}}$$
-Regression line $\hat y=a+bx$: $b=\frac{\sum(x_i-\bar x)(y_i-\bar y)}{\sum(x_i-\bar x)^2}$, $a=\bar y-b\bar x$.
-
-> **Must-know facts**
-> - $-1\le r\le1$. $r=\pm1$ means all points lie on a line. $r=0$ means no **linear** relation (there can still be a nonlinear one, e.g. $y=x^2$).
-> - $r$ has no units. Changing units (cm → m, kg → g) does **not** change $r$.
-> - Correlation is **not** causation.
-> - The regression line goes through $(\bar x,\bar y)$. $R^2=r^2$ = share of the variance of $y$ explained by the line.
-> - Example: $x=1,2,3,4,5$; $y=2,4,5,4,5$ gives $b=\frac6{10}=0.6$, $a=4-0.6\cdot3=2.2$, so $\hat y=2.2+0.6x$.
-
----
-
-## 9. Chi-square, t and F distributions; MLE 🟡
-
-> **Must-know facts**
-> - $\chi^2_k$ (chi-square with $k$ degrees of freedom) = sum of $k$ squared independent $N(0,1)$ variables. Mean $k$, variance $2k$. Only positive values.
-> - $\chi^2$ tests: goodness of fit has df $=$ (number of classes) $-1$; independence test in an $r\times c$ table has df $=(r-1)(c-1)$. Statistic $\sum\frac{(O-E)^2}{E}$ ($O$ = observed, $E$ = expected count).
-> - $t_\nu$ is symmetric like $N(0,1)$ but has **heavier tails**, so $t$-values are bigger than $z$-values. As $\nu\to\infty$, $t_\nu\to N(0,1)$.
-> - $F$ distribution = ratio of two scaled $\chi^2$ variables; used to compare two variances (and in ANOVA).
-> - **MLE** (maximum likelihood estimator) = the parameter value that makes the observed data most likely. Examples: Bernoulli $\hat p=\bar x$; Poisson $\hat\lambda=\bar x$; Exponential $\hat\lambda=\frac1{\bar x}$; Normal $\hat\mu=\bar x$.
+> **Trap:** "non-parametric" does not mean "no assumptions" — e.g. independence of observations is still required, and Wilcoxon signed-rank assumes symmetric differences.
 
 ---
 
@@ -336,315 +283,310 @@ Regression line $\hat y=a+bx$: $b=\frac{\sum(x_i-\bar x)(y_i-\bar y)}{\sum(x_i-\
 
 | Topic | Formula |
 |---|---|
-| Mean | $\bar x=\frac1n\sum x_i$ |
-| Sample variance | $s^2=\frac1{n-1}\sum(x_i-\bar x)^2$ |
-| IQR | $Q_3-Q_1$; outlier if outside $[Q_1-1.5\,IQR,\ Q_3+1.5\,IQR]$ |
-| Variance | $\operatorname{Var}X=E[X^2]-(EX)^2$ |
-| Linear change | $E[aX+b]=a\mu+b$, $\operatorname{SD}(aX+b)=\lvert a\rvert\sigma$ |
-| Binomial | mean $np$, variance $npq$ |
-| Poisson | mean $=$ variance $=\lambda$ |
-| Uniform$[a,b]$ | mean $\frac{a+b}2$, variance $\frac{(b-a)^2}{12}$ |
-| Exponential | mean $\frac1\lambda$, variance $\frac1{\lambda^2}$, $P(X>t)=e^{-\lambda t}$ |
-| Standardize | $z=\frac{x-\mu}{\sigma}$, $\Phi(-z)=1-\Phi(z)$ |
-| Standard error | $SE=\frac{\sigma}{\sqrt n}$ |
-| CI ($\sigma$ known) | $\bar x\pm z\frac{\sigma}{\sqrt n}$ |
-| CI ($\sigma$ unknown) | $\bar x\pm t_{n-1}\frac{s}{\sqrt n}$ |
-| Sample size | $n=\left(\frac{z\sigma}{E}\right)^2$, round up |
-| $z$-test | $z=\frac{\bar x-\mu_0}{\sigma/\sqrt n}$ |
-| $t$-test | $t=\frac{\bar x-\mu_0}{s/\sqrt n}$, df $n-1$ |
-| Decision | reject $H_0$ if $p\le\alpha$ |
-| Errors | type I: $P=\alpha$; type II: $P=\beta$; power $=1-\beta$ |
-| $z$ critical values | 1.645 (90%), 1.96 (95%), 2.576 (99%) |
+| sample variance | $s^2=\frac1{n-1}\sum(x_i-\bar x)^2$ |
+| IQR / outliers | $Q_3-Q_1$; outside $[Q_1-1.5IQR,\ Q_3+1.5IQR]$ |
+| variance | $E[X^2]-(EX)^2$ |
+| skewness / kurtosis | $\frac{E(X-\mu)^3}{\sigma^3}$ / $\frac{E(X-\mu)^4}{\sigma^4}$ (normal: $0$ / $3$) |
+| standardize | $z=\frac{x-\mu}\sigma$, $\Phi(-z)=1-\Phi(z)$ |
+| unbiased | $E[\hat\theta]=\theta$; $MSE=\operatorname{Var}+\text{bias}^2$ |
+| SE | $\frac\sigma{\sqrt n}$ |
+| CI mean | $\bar x\pm z\frac\sigma{\sqrt n}$ or $\bar x\pm t_{n-1}\frac s{\sqrt n}$ |
+| sample size | $n=(z\sigma/E)^2$, round up |
+| $z$ / $t$ test | $\frac{\bar x-\mu_0}{\sigma/\sqrt n}$ / $\frac{\bar x-\mu_0}{s/\sqrt n}$ |
+| decision | reject $H_0$ ⇔ $p\le\alpha$ |
+| errors | type I $\alpha$; type II $\beta$; power $1-\beta$ |
 | $\chi^2$ df | $k-1$ (fit), $(r-1)(c-1)$ (independence) |
+| sign test | $S\sim\text{Bin}(n,\frac12)$ under $H_0$ |
+| non-parametric pairs | paired $t$ ↔ Wilcoxon signed-rank; two-sample $t$ ↔ Mann–Whitney; ANOVA ↔ Kruskal–Wallis; Pearson ↔ Spearman |
 
 ---
 
 ## Practice MCQs
 
-**Q1.** What is the median of the data $3,\ 1,\ 7,\ 5,\ 9$?
-- A) $3$
-- B) $5$
-- C) $7$
-- D) $5.5$
+**Q1.** (official example 1) A normal distribution is fully determined by
+A) mean only  B) variance only  C) mean and variance  D) median and mode  E) skewness
 
 <details><summary>Answer</summary>
 
-**B** — Sort: $1,3,5,7,9$. The middle (3rd) value is $5$.
+**C** — $N(\mu,\sigma^2)$ has exactly two parameters.
 
 </details>
 
-**Q2.** Data: $2,4,4,4,5,5,7,9$. Mean, median and mode are
-- A) $5,\ 4.5,\ 4$
-- B) $5,\ 5,\ 4$
-- C) $4.5,\ 5,\ 4$
-- D) $5,\ 4.5,\ 5$
+**Q2.** (official example 2) In hypothesis testing, the significance level $\alpha$ is
+A) the probability of rejecting a false null hypothesis  B) the probability of retaining a true null hypothesis  C) the probability of a type I error  D) the probability that the null hypothesis is true  E) the probability of a type II error
 
 <details><summary>Answer</summary>
 
-**A** — Mean $\frac{40}8=5$. Median $\frac{4+5}2=4.5$. Mode $4$ (three times).
+**C** — Rejecting $H_0$ although it is true. A is the power, B is $1-\alpha$, E is $\beta$.
 
 </details>
 
-**Q3.** The number $10$ is added to every value of a data set. What happens?
-- A) Mean and SD both increase by 10
-- B) Mean stays the same, SD increases by 10
-- C) Mean increases by 10, SD does not change
-- D) Nothing changes
+**Q3.** The median of $3,1,7,5,9$ is
+A) $3$  B) $5$  C) $7$  D) $5.5$  E) $1$
 
 <details><summary>Answer</summary>
 
-**C** — Shifting all data moves the centre but not the spread.
+**B** — Sorted: $1,3,5,7,9$.
 
 </details>
 
-**Q4.** $X\sim\text{Bin}(10,\,0.3)$. $\operatorname{Var}(X)=$
-- A) $3$
-- B) $0.21$
-- C) $7$
-- D) $2.1$
+**Q4.** Data $2,4,4,4,5,5,7,9$: mean, median, mode are
+A) $5,4.5,4$  B) $5,5,4$  C) $4.5,5,4$  D) $5,4.5,5$  E) $4,4.5,5$
 
 <details><summary>Answer</summary>
 
-**D** — $npq=10\cdot0.3\cdot0.7=2.1$.
+**A** — Mean $\frac{40}8$; median $\frac{4+5}2$; mode $4$ (three times).
 
 </details>
 
-**Q5.** For which distribution are the mean and the variance always equal?
-- A) Poisson
-- B) Binomial
-- C) Exponential
-- D) Uniform
+**Q5.** $10$ is added to every value. Then
+A) mean and SD increase by 10  B) mean unchanged, SD +10  C) mean +10, SD unchanged  D) nothing changes  E) both multiply by 10
 
 <details><summary>Answer</summary>
 
-**A** — Poisson$(\lambda)$: mean $\lambda$ and variance $\lambda$.
+**C** — A shift moves the centre, not the spread.
 
 </details>
 
-**Q6.** $X\sim U[2,8]$. Mean and variance are
-- A) $(5,\ 6)$
-- B) $(5,\ 3)$
-- C) $(5,\ 36)$
-- D) $(4,\ 3)$
+**Q6.** Data $3,7,8,5,12$: $s^2=$
+A) $9.2$  B) $46$  C) $11.5$  D) $7$  E) $3.39$
 
 <details><summary>Answer</summary>
 
-**B** — Mean $\frac{2+8}2=5$. Variance $\frac{6^2}{12}=3$.
+**C** — $\bar x=7$, squared deviations sum to $46$, divide by $4$. ($9.2$ divides by $n$.)
 
 </details>
 
-**Q7.** A type I error means
-- A) not rejecting $H_0$ when $H_0$ is false
-- B) choosing $\alpha$ too big
-- C) rejecting $H_0$ when $H_0$ is true
-- D) rejecting $H_0$ when $H_0$ is false
+**Q7.** $Q_1=20$, $Q_3=30$. Which value is an outlier ($1.5\,IQR$ rule)?
+A) $6$  B) $44$  C) $35$  D) $47$  E) $15$
 
 <details><summary>Answer</summary>
 
-**C** — Type I = false alarm. Its probability is $\alpha$. A is a type II error; D is a correct decision.
+**D** — Fences $5$ and $45$.
 
 </details>
 
-**Q8.** The p-value is
-- A) the probability that $H_0$ is true
-- B) the probability of a type II error
-- C) the probability that $H_1$ is true
-- D) the probability, if $H_0$ is true, of a result at least as extreme as the observed one
+**Q8.** Strongly right-skewed data usually have
+A) mean < median  B) mean > median  C) mean = median  D) skewness < 0  E) kurtosis 0
 
 <details><summary>Answer</summary>
 
-**D** — This is the definition. A and C are the most common wrong answers.
+**B** — The long right tail pulls the mean up.
 
 </details>
 
-**Q9.** The sample variance uses $n-1$ in the denominator because
-- A) then $E[S^2]=\sigma^2$ (unbiased)
-- B) then $S$ is robust to outliers
-- C) then $S^2$ is always smaller
-- D) then $S$ is unbiased for $\sigma$
+**Q9.** The kurtosis $E[(X-\mu)^4]/\sigma^4$ of a normal distribution is
+A) $0$  B) $1$  C) $2$  D) $3$  E) $4$
 
 <details><summary>Answer</summary>
 
-**A** — With $n-1$ the estimator is correct on average. (With $n$ it would be too small on average.)
+**D** — Excess kurtosis is $3-3=0$ (A is the excess).
 
 </details>
 
-**Q10.** Data: $3,7,8,5,12$. The sample variance $s^2$ is
-- A) $9.2$
-- B) $46$
-- C) $11.5$
-- D) $7$
+**Q10.** $E[X]=2$, $E[X^2]=5$. $\operatorname{Var}X=$
+A) $3$  B) $1$  C) $9$  D) $\sqrt5-2$  E) $4$
 
 <details><summary>Answer</summary>
 
-**C** — $\bar x=7$. Squared deviations: $16,0,1,4,25$, sum $46$. $s^2=\frac{46}{5-1}=11.5$. (9.2 divides by $n$.)
+**B** — $5-2^2$.
 
 </details>
 
-**Q11.** $Q_1=20$ and $Q_3=30$. With the $1.5\cdot IQR$ rule, which value is an outlier?
-- A) $6$
-- B) $44$
-- C) $35$
-- D) $47$
+**Q11.** IQ $\sim N(100,15^2)$. $P(\text{IQ}>130)\approx$
+A) $0.0228$  B) $0.0456$  C) $0.1587$  D) $0.9772$  E) $0.05$
 
 <details><summary>Answer</summary>
 
-**D** — $IQR=10$. Fences: $20-15=5$ and $30+15=45$. Only $47$ is outside.
+**A** — $z=2$.
 
 </details>
 
-**Q12.** IQ $\sim N(100,15^2)$. $P(\text{IQ}>130)\approx$
-- A) $0.0228$
-- B) $0.0456$
-- C) $0.1587$
-- D) $0.9772$
+**Q12.** $X\sim N(50,16)$. $P(46<X<54)\approx$
+A) $0.95$  B) $0.68$  C) $0.50$  D) $0.99$  E) $0.34$
 
 <details><summary>Answer</summary>
 
-**A** — $z=\frac{130-100}{15}=2$. $1-\Phi(2)=1-0.9772=0.0228$.
+**B** — $\sigma=4$: $\mu\pm1\sigma$.
 
 </details>
 
-**Q13.** $X\sim N(50,\,16)$. $P(46<X<54)\approx$
-- A) $0.95$
-- B) $0.68$
-- C) $0.50$
-- D) $0.99$
+**Q13.** $Z\sim N(0,1)$. Then $2Z+1\sim$
+A) $N(1,2)$  B) $N(1,4)$  C) $N(2,1)$  D) $N(0,4)$  E) $N(1,\sqrt2)$
 
 <details><summary>Answer</summary>
 
-**B** — $\sigma=\sqrt{16}=4$. The interval is $\mu\pm1\sigma$, so $2\Phi(1)-1\approx0.68$.
+**B** — Mean $2\cdot0+1$, variance $2^2\cdot1$.
 
 </details>
 
-**Q14.** $\bar x=50$, $\sigma=10$ known, $n=100$. The 95% CI for $\mu$ is
-- A) $[48.355,\ 51.645]$
-- B) $[47.424,\ 52.576]$
-- C) $[30.4,\ 69.6]$
-- D) $[48.04,\ 51.96]$
+**Q14.** An estimator $\hat\theta$ of $\theta$ is unbiased if
+A) $\hat\theta=\theta$ always  B) $E[\hat\theta]=\theta$  C) $\operatorname{Var}\hat\theta=0$  D) $\hat\theta\to\theta$ almost surely  E) $\hat\theta$ is the MLE
 
 <details><summary>Answer</summary>
 
-**D** — $SE=\frac{10}{10}=1$; $50\pm1.96$. A uses 1.645 (90%), B uses 2.576 (99%), C forgets $\sqrt n$.
+**B** — D describes (strong) consistency, a different property.
 
 </details>
 
-**Q15.** You want a CI that is half as wide (same level, same $\sigma$). The sample size must be
-- A) doubled
-- B) multiplied by 4
-- C) halved
-- D) multiplied by $\sqrt2$
+**Q15.** The sample variance uses $n-1$ because
+A) then $E[S^2]=\sigma^2$  B) then $S$ is robust  C) then $S^2$ is smaller  D) then $S$ is unbiased for $\sigma$  E) then $S^2$ is the MLE
 
 <details><summary>Answer</summary>
 
-**B** — Width $\propto\frac1{\sqrt n}$. To halve it, $\sqrt n$ must double, so $n$ must be 4 times bigger.
+**A** — D is false ($S$ is biased for $\sigma$); the normal MLE divides by $n$ (E false).
 
 </details>
 
-**Q16.** $n=16$ normal observations, $\bar x=20$, $s=4$, $\sigma$ unknown. The 95% CI for $\mu$ is
-- A) $20\pm1.96\cdot1$
-- B) $20\pm2.131\cdot4$
-- C) $20\pm2.131\cdot1$
-- D) $20\pm1.96\cdot4$
+**Q16.** The mean squared error of an estimator equals
+A) variance + bias  B) variance + bias²  C) variance × bias  D) bias²  E) variance − bias²
 
 <details><summary>Answer</summary>
 
-**C** — $\sigma$ unknown, so use $t$ with $15$ df: $2.131$. $SE=\frac{4}{\sqrt{16}}=1$.
+**B** — $E[(\hat\theta-\theta)^2]=\operatorname{Var}\hat\theta+(E\hat\theta-\theta)^2$.
 
 </details>
 
-**Q17.** Test $H_0:\mu=50$ against $H_1:\mu\neq50$ with $\sigma=8$, $n=64$, $\bar x=52$. Which is correct?
-- A) $z=0.25$; do not reject at 5%
-- B) $z=2$; reject at 5% but not at 1%
-- C) $z=2$; reject at 1%
-- D) $z=16$; reject at every level
+**Q17.** The MLE of $\lambda$ for an Exponential$(\lambda)$ sample is
+A) $\bar x$  B) $\frac1{\bar x}$  C) $\max x_i$  D) $s^2$  E) $\frac n{\bar x}$
 
 <details><summary>Answer</summary>
 
-**B** — $SE=\frac8{8}=1$, $z=\frac{52-50}1=2$. $1.96<2<2.576$.
+**B** — $\frac n\lambda-\sum x_i=0$. (Mean of exponential is $\frac1\lambda$.)
 
 </details>
 
-**Q18.** A test gives $p=0.03$. Which statement is true?
-- A) $H_0$ is rejected at $\alpha=0.01$
-- B) $H_0$ is true with probability 3%
-- C) $H_0$ is rejected at $\alpha=0.05$
-- D) The effect is large
+**Q18.** For $X_i\sim U[0,\theta]$, the estimator $\max X_i$ is
+A) unbiased  B) biased, it tends to underestimate $\theta$  C) biased, it overestimates $\theta$  D) not consistent  E) always equal to $\theta$
 
 <details><summary>Answer</summary>
 
-**C** — $0.03\le0.05$, so reject at 5%. But $0.03>0.01$. The p-value says nothing about $P(H_0)$ or the size of the effect.
+**B** — It is always $\le\theta$, $E=\frac n{n+1}\theta$. It is still consistent.
 
 </details>
 
-**Q19.** All else equal, which change **increases** the power of a test?
-- A) a larger sample size
-- B) a smaller $\alpha$
-- C) a smaller sample size
-- D) a larger population SD
+**Q19.** To halve the width of a CI (same level and $\sigma$), the sample size must be
+A) doubled  B) multiplied by 4  C) halved  D) multiplied by $\sqrt2$  E) multiplied by 8
 
 <details><summary>Answer</summary>
 
-**A** — Larger $n$ gives a smaller SE, so it is easier to detect a true effect. B, C and D reduce the power.
+**B** — Width $\propto\frac1{\sqrt n}$.
 
 </details>
 
-**Q20.** A 95% CI for $\mu$ is $[12.1,\ 15.3]$. A two-sided test at $\alpha=0.05$
-- A) rejects $H_0:\mu=14$
-- B) rejects $H_0:\mu=13$
-- C) rejects $H_0:\mu=12.5$
-- D) rejects $H_0:\mu=16$
+**Q20.** $\bar x=50$, $\sigma=10$ known, $n=100$. The 95% CI is
+A) $[48.355,51.645]$  B) $[47.424,52.576]$  C) $[30.4,69.6]$  D) $[48.04,51.96]$  E) $[49,51]$
 
 <details><summary>Answer</summary>
 
-**D** — The test rejects exactly the values outside the CI. Only $16$ is outside $[12.1,15.3]$.
+**D** — $50\pm1.96\cdot1$. A: 90%; B: 99%; C forgets $\sqrt n$.
 
 </details>
 
-**Q21.** What is the critical value for a **one-sided** $z$-test at $\alpha=0.05$?
-- A) $1.96$
-- B) $2.576$
-- C) $1.645$
-- D) $1.28$
+**Q21.** $n=16$ normal observations, $\bar x=20$, $s=4$, $\sigma$ unknown. The 95% CI is
+A) $20\pm1.96\cdot1$  B) $20\pm2.131\cdot4$  C) $20\pm2.131\cdot1$  D) $20\pm1.96\cdot4$  E) $20\pm2.120\cdot1$
 
 <details><summary>Answer</summary>
 
-**C** — One-sided 5%: $\Phi(z)=0.95$, so $z=1.645$. (1.96 is for two-sided 5%.)
+**C** — $t$ with $15$ df, $SE=1$. ($2.120$ is the value for 16 df.)
 
 </details>
 
-**Q22.** A data set is strongly right-skewed (like incomes). Usually
-- A) mean < median
-- B) mean > median
-- C) mean = median
-- D) skewness < 0
+**Q22.** A 95% confidence interval means
+A) $\mu$ lies in this interval with probability 95%  B) 95% of the data lie in the interval  C) in repeated sampling, 95% of such intervals contain $\mu$  D) the sample mean is correct with probability 95%  E) $\alpha=0.95$
 
 <details><summary>Answer</summary>
 
-**B** — The long right tail pulls the mean up, but not the median.
+**C** — $\mu$ is fixed; the interval is random.
 
 </details>
 
-**Q23.** Height (in cm) and weight (in kg) have correlation $r=0.6$. Height is changed to metres and weight to grams. The new correlation is
-- A) $0.006$
-- B) $600$
-- C) $-0.6$
-- D) $0.6$
+**Q23.** $H_0:\mu=50$ vs $\mu\ne50$, $\sigma=8$, $n=64$, $\bar x=52$. Which is correct?
+A) $z=0.25$, do not reject at 5%  B) $z=2$; reject at 5% but not at 1%  C) $z=2$; reject at 1%  D) $z=16$  E) $z=2$; do not reject at 5%
 
 <details><summary>Answer</summary>
 
-**D** — Correlation has no units. Multiplying by positive constants does not change $r$.
+**B** — $1.96<2<2.576$.
 
 </details>
 
-**Q24.** A $\chi^2$ test of independence uses a $3\times4$ table. The degrees of freedom are
-- A) $6$
-- B) $12$
-- C) $11$
-- D) $7$
+**Q24.** The p-value is
+A) the probability that $H_0$ is true  B) the probability of a type II error  C) the probability that $H_1$ is true  D) the probability, under $H_0$, of a result at least as extreme as observed  E) the significance level
 
 <details><summary>Answer</summary>
 
-**A** — $(r-1)(c-1)=(3-1)(4-1)=2\cdot3=6$.
+**D** — The definition. A and C are the classic wrong answers.
+
+</details>
+
+**Q25.** $p=0.03$. Then
+A) reject at $\alpha=0.01$  B) $H_0$ is true with probability 3%  C) reject at $\alpha=0.05$  D) the effect is large  E) $\beta=0.97$
+
+<details><summary>Answer</summary>
+
+**C** — $0.03\le0.05$ but $>0.01$.
+
+</details>
+
+**Q26.** Which change increases the power of a test?
+A) larger sample size  B) smaller $\alpha$  C) smaller sample size  D) larger population SD  E) a two-sided instead of a one-sided test (true effect in the tested direction)
+
+<details><summary>Answer</summary>
+
+**A** — The others reduce power.
+
+</details>
+
+**Q27.** A 95% CI for $\mu$ is $[12.1,15.3]$. A two-sided 5% test rejects
+A) $\mu_0=14$  B) $\mu_0=13$  C) $\mu_0=12.5$  D) $\mu_0=16$  E) $\mu_0=15$
+
+<details><summary>Answer</summary>
+
+**D** — Exactly the values outside the CI.
+
+</details>
+
+**Q28.** Two independent samples, small, clearly non-normal with outliers. Which test compares their locations?
+A) two-sample $t$-test  B) Mann–Whitney U test  C) paired $t$-test  D) $F$-test  E) one-sample $z$-test
+
+<details><summary>Answer</summary>
+
+**B** — The rank-based alternative to the two-sample $t$-test.
+
+</details>
+
+**Q29.** The non-parametric alternative to the paired $t$-test is
+A) Kruskal–Wallis  B) Mann–Whitney U  C) Wilcoxon signed-rank test  D) $\chi^2$ test of independence  E) ANOVA
+
+<details><summary>Answer</summary>
+
+**C** — (or the sign test). Kruskal–Wallis replaces one-way ANOVA.
+
+</details>
+
+**Q30.** Compared with parametric tests, non-parametric tests
+A) always have higher power  B) need normally distributed data  C) need fewer distributional assumptions but usually have less power when the data really are normal  D) cannot be used for small samples  E) test only variances
+
+<details><summary>Answer</summary>
+
+**C** — They use signs/ranks, so they are robust, but they waste some information when normality holds.
+
+</details>
+
+**Q31.** Sign test: in 10 pairs, 9 differences are positive. The one-sided p-value is
+A) $\frac9{10}$  B) $\frac{11}{1024}$  C) $\frac1{1024}$  D) $\frac{10}{1024}$  E) $0.5$
+
+<details><summary>Answer</summary>
+
+**B** — $P(S\ge9)$ with $S\sim\text{Bin}(10,\frac12)$: $\frac{10+1}{1024}$.
+
+</details>
+
+**Q32.** A $\chi^2$ test of independence uses a $3\times4$ table. Degrees of freedom:
+A) $6$  B) $12$  C) $11$  D) $7$  E) $5$
+
+<details><summary>Answer</summary>
+
+**A** — $(3-1)(4-1)$.
 
 </details>

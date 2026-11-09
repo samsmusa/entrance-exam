@@ -1,650 +1,635 @@
-# 07. Measure Theory and Probability
+# 07. Measure and Probability Theory
 
-> **Syllabus:**
-> - Zero-measures (null sets)
-> - Expectations
-> - Distributions / densities
-> - Independence and conditional probabilities
-> - Laws of large numbers and central limit theorem
+> **Official topics (Placement Test guide):** σ-algebras and measures; null sets; Riemann and Lebesgue integral; probability spaces; independence of events and random variables; densities, distribution functions and expectation; laws of large numbers, central limit theorem.
 >
-> **How to study this file:** Sections 1–9 are 🟢 core. Learn them well and do the worked examples yourself.
-> Sections 10–12 are 🟡: only read the "Must-know facts" boxes. Time: about 4–5 hours, plus 1 hour for the MCQs.
+> **Exam:** 7 questions on this topic, 5 options each, about 85 seconds per question. Mostly definitions (σ-algebra, density, independence, LLN) plus short calculations (Bayes, expectation, variance, CLT).
+>
+> **How to study this file:** every section is 🟢 (all are on the official list). Learn the definitions word for word, do the worked examples, then the MCQs. Time: about 5 hours + 1 hour MCQs.
+>
+> *Removed (not on the official list, or covered elsewhere):* counting probabilities with combinatorics (→ [03-discrete-mathematics.md](03-discrete-mathematics.md); only one Laplace example is kept), geometric probability as a separate topic (one example kept in section 5), z-tables and hypothesis testing (→ [08-statistics.md](08-statistics.md)). Markov and Chebyshev are now part of section 9.
 
 ## Contents
-1. [Counting probabilities](#1-counting-probabilities-) 🟢
-2. [Rules for events (complement, union, union bound)](#2-rules-for-events-) 🟢
-3. [Conditional probability, total probability, Bayes](#3-conditional-probability-total-probability-bayes-) 🟢
-4. [Independence](#4-independence-) 🟢
-5. [Discrete random variables](#5-discrete-random-variables-) 🟢
-6. [Continuous random variables: PDF and CDF](#6-continuous-random-variables-pdf-and-cdf-) 🟢
-7. [Expectation and variance](#7-expectation-and-variance-) 🟢
+1. [σ-algebras, measures and probability spaces](#1-σ-algebras-measures-and-probability-spaces-) 🟢
+2. [Null sets and Lebesgue measure](#2-null-sets-and-lebesgue-measure-) 🟢
+3. [Riemann and Lebesgue integral](#3-riemann-and-lebesgue-integral-) 🟢
+4. [Conditional probability and Bayes](#4-conditional-probability-and-bayes-) 🟢
+5. [Independence of events and random variables](#5-independence-of-events-and-random-variables-) 🟢
+6. [Random variables, distribution functions and densities](#6-random-variables-distribution-functions-and-densities-) 🟢
+7. [Expectation, variance, moments](#7-expectation-variance-moments-) 🟢
 8. [Standard distributions](#8-standard-distributions-) 🟢
-9. [Geometric probability (areas)](#9-geometric-probability-areas-) 🟢
-10. [Central limit theorem and law of large numbers](#10-central-limit-theorem-and-law-of-large-numbers-) 🟢 / 🟡
-11. [Markov and Chebyshev inequalities](#11-markov-and-chebyshev-inequalities-) 🟡
-12. [Null sets and measure theory](#12-null-sets-and-measure-theory-) 🟡
-13. [Formula sheet](#formula-sheet)
-14. [Practice MCQs](#practice-mcqs)
-
-**Symbols used in this file**
-
-| Symbol | Meaning |
-|---|---|
-| $\Omega$ | sample space = set of all possible outcomes |
-| $A, B$ | events = subsets of $\Omega$ |
-| $A^c$ | complement: "$A$ does not happen" |
-| $A\cap B$ | "$A$ and $B$ both happen" |
-| $A\cup B$ | "$A$ or $B$ (or both) happens" |
-| $P(A)$ | probability of $A$, a number in $[0,1]$ |
-| $X, Y$ | random variables (numbers that depend on chance) |
-| $E[X]$ | expectation (mean) of $X$ |
-| $\operatorname{Var}(X)$ | variance of $X$ |
+9. [Laws of large numbers](#9-laws-of-large-numbers-) 🟢
+10. [Central limit theorem](#10-central-limit-theorem-) 🟢
+11. [Formula sheet](#formula-sheet)
+12. [Practice MCQs](#practice-mcqs) (30 questions, 5 options)
 
 ---
 
-## 1. Counting probabilities 🟢
+## 1. σ-algebras, measures and probability spaces 🟢
 
-**Meaning.** If all outcomes are equally likely, probability = "good cases divided by all cases".
+### σ-algebra
+A **σ-algebra** on a set $\Omega$ is a family $\mathcal F$ of subsets of $\Omega$ with
+1. $\Omega\in\mathcal F$,
+2. $A\in\mathcal F\Rightarrow A^c\in\mathcal F$ (closed under complements),
+3. $A_1,A_2,\dots\in\mathcal F\Rightarrow\bigcup_{n}A_n\in\mathcal F$ (closed under **countable** unions).
 
-**Formula (Laplace).**
-$$P(A)=\frac{\lvert A\rvert}{\lvert \Omega\rvert}=\frac{\text{number of good outcomes}}{\text{number of all outcomes}}$$
+Consequences: $\emptyset\in\mathcal F$; closed under countable intersections ($\bigcap A_n=(\bigcup A_n^c)^c$) and differences.
 
-**Counting tools** ($n! = 1\cdot2\cdots n$, and $\binom nk=\frac{n!}{k!(n-k)!}$ = "$n$ choose $k$"):
-
-| Situation | Number of ways |
+**Examples**
+| $\mathcal F$ | Comment |
 |---|---|
-| Order matters, with repetition ($k$ draws from $n$) | $n^k$ |
-| Order matters, no repetition | $n(n-1)\cdots(n-k+1)$ |
-| Order does not matter, no repetition | $\binom nk$ |
-| Arrange $n$ different objects in a row | $n!$ |
+| $\{\emptyset,\Omega\}$ | trivial (smallest) σ-algebra |
+| $\mathcal P(\Omega)$ (all subsets) | largest; used for finite / countable $\Omega$ |
+| $\sigma(A)=\{\emptyset,A,A^c,\Omega\}$ | smallest σ-algebra containing $A$ |
+| **Borel σ-algebra** $\mathcal B(\mathbb R)$ | generated by the open sets (equivalently by intervals $(a,b]$); contains all open and closed sets, points, $\mathbb Q$, … |
 
-**Worked example.** Roll two fair dice. What is $P(\text{sum}=7)$?
-1. All outcomes: $6\cdot 6=36$ pairs $(a,b)$.
-2. Good outcomes: $(1,6),(2,5),(3,4),(4,3),(5,2),(6,1)$, so 6 pairs.
-3. $P=\frac{6}{36}=\frac16$.
+> **Must-know facts**
+> 1. The **intersection** of σ-algebras is a σ-algebra; a **union** of two usually is not.
+> 2. On a finite $\Omega$, the σ-algebra generated by a partition into $k$ blocks has $2^k$ elements.
+> 3. Not every subset of $\mathbb R$ is Borel / Lebesgue measurable (Vitali set). That is why we need σ-algebras at all.
+> 4. Algebra = closed under **finite** unions only. σ = "countable".
 
-**Worked example 2.** An urn has 3 red and 2 blue balls. Draw 2 without putting back. $P(\text{both red})$?
-1. All ways: $\binom52=10$. Good ways: $\binom32=3$.
-2. $P=\frac{3}{10}$. (Check step by step: $\frac35\cdot\frac24=\frac{6}{20}=\frac3{10}$ ✓.)
+**Worked example.** $\Omega=\{1,2,3\}$. Is $\{\emptyset,\{1\},\{2,3\},\Omega\}$ a σ-algebra? Contains $\Omega$ ✓; complements: $\{1\}^c=\{2,3\}$ ✓; unions: $\{1\}\cup\{2,3\}=\Omega$ ✓. Yes. But $\{\emptyset,\{1\},\Omega\}$ is not ($\{2,3\}$ missing).
 
-> **Trap:** with two dice, $(1,6)$ and $(6,1)$ are **different** outcomes. If you count "sums" (2, 3, …, 12) as equally likely, you get wrong answers.
+### Measure
+A **measure** on $(\Omega,\mathcal F)$ is $\mu:\mathcal F\to[0,\infty]$ with
+1. $\mu(\emptyset)=0$,
+2. **countable additivity:** $A_1,A_2,\dots$ pairwise disjoint ⇒ $\mu\left(\bigcup A_n\right)=\sum\mu(A_n)$.
 
----
+Examples: **counting measure** ($\mu(A)=\lvert A\rvert$), **Dirac measure** $\delta_x(A)=1$ if $x\in A$, else $0$; **Lebesgue measure** $\lambda$ on $\mathbb R$ with $\lambda((a,b])=b-a$.
 
-## 2. Rules for events 🟢
+**Properties:** monotone ($A\subseteq B\Rightarrow\mu(A)\le\mu(B)$); **σ-subadditive** ($\mu(\bigcup A_n)\le\sum\mu(A_n)$); **continuity from below:** $A_n\uparrow A\Rightarrow\mu(A_n)\to\mu(A)$; from above if $\mu(A_1)<\infty$.
 
-**Meaning.** Some simple rules let you compute new probabilities from known ones.
+### Probability space
+A **probability space** $(\Omega,\mathcal F,P)$: sample space $\Omega$, σ-algebra $\mathcal F$ of **events**, measure $P$ with $P(\Omega)=1$ (**Kolmogorov axioms**).
 
+| Model | $\Omega$ | $\mathcal F$ | $P$ |
+|---|---|---|---|
+| fair die | $\{1,\dots,6\}$ | $\mathcal P(\Omega)$ | $P(A)=\frac{\lvert A\rvert}{6}$ (Laplace) |
+| uniform point in $[0,1]$ | $[0,1]$ | Borel sets | Lebesgue measure |
+
+**Rules for events**
 | Rule | Formula |
 |---|---|
-| Complement | $P(A^c)=1-P(A)$ |
-| Empty set | $P(\emptyset)=0$ |
-| Subset | $A\subseteq B\Rightarrow P(A)\le P(B)$ |
-| Union of two (inclusion–exclusion) | $P(A\cup B)=P(A)+P(B)-P(A\cap B)$ |
-| Disjoint events ($A\cap B=\emptyset$) | $P(A\cup B)=P(A)+P(B)$ |
-| **Union bound** (Boole) | $P(A_1\cup\dots\cup A_n)\le P(A_1)+\dots+P(A_n)$ |
-| "At least one" | $P(\text{at least one})=1-P(\text{none})$ |
+| complement | $P(A^c)=1-P(A)$ |
+| inclusion–exclusion | $P(A\cup B)=P(A)+P(B)-P(A\cap B)$ |
+| union bound | $P(\bigcup A_i)\le\sum P(A_i)$ |
+| at least one | $1-P(\text{none})$ |
 
-**Why the union bound is true** (official problem 11). For two events:
-$P(A\cup B)=P(A)+P(B)-P(A\cap B)\le P(A)+P(B)$, because $P(A\cap B)\ge0$.
-For $n$ events, use induction: add one event at a time.
+**Example.** Two dice, $P(\text{sum}=7)=\frac{6}{36}=\frac16$ (36 equally likely ordered pairs). $P(A)=0.5$, $P(B)=0.4$, $P(A\cap B)=0.2$ ⇒ $P(A\cup B)=0.7$.
 
-**Worked example.** $P(A)=0.5$, $P(B)=0.4$, $P(A\cap B)=0.2$.
-1. $P(A\cup B)=0.5+0.4-0.2=0.7$.
-2. $P(\text{neither }A\text{ nor }B)=1-0.7=0.3$.
-
-**Worked example 2.** Roll a die 4 times. $P(\text{at least one six})$?
-1. $P(\text{no six in one roll})=\frac56$. Rolls are independent, so $P(\text{no six at all})=\left(\frac56\right)^4=\frac{625}{1296}$.
-2. $P(\text{at least one six})=1-\frac{625}{1296}\approx0.518$.
-
-> **Trap:** the union bound gives only an **upper bound**. With $P(A_i)=0.1,0.2,0.3$ the bound is $0.6$, but the true value can be smaller.
+> **Trap:** a σ-algebra must be closed under **countable** unions, not only finite ones, and must contain complements.
 
 ---
 
-## 3. Conditional probability, total probability, Bayes 🟢
+## 2. Null sets and Lebesgue measure 🟢
 
-**Meaning.** $P(A\mid B)$ = "probability of $A$ **if we already know** that $B$ happened". We look only inside $B$.
+A **null set** is a measurable $N$ with $\mu(N)=0$. A property holds **almost everywhere (a.e.)** / **almost surely (a.s.)** if it fails only on a null set.
 
-**Formulas.**
-$$P(A\mid B)=\frac{P(A\cap B)}{P(B)}\qquad (P(B)>0)$$
-$$\text{Multiplication rule: } P(A\cap B)=P(B)\,P(A\mid B)$$
-If $B_1,\dots,B_n$ split $\Omega$ into disjoint parts (a **partition**):
-$$\text{Total probability: } P(A)=\sum_i P(A\mid B_i)\,P(B_i)$$
-$$\text{Bayes: } P(B_j\mid A)=\frac{P(A\mid B_j)\,P(B_j)}{P(A)}$$
+> **Must-know facts**
+> 1. Points have Lebesgue measure $0$; every **countable** set ($\mathbb N,\mathbb Z,\mathbb Q$) is a null set. $\lambda(\mathbb Q\cap[0,1])=0$, $\lambda([0,1]\setminus\mathbb Q)=1$.
+> 2. The **Cantor set** is a null set but **uncountable**. Null ⇏ countable.
+> 3. A countable union of null sets is a null set. A line in $\mathbb R^2$, the graph of a continuous function, has area $0$.
+> 4. Changing a function on a null set does not change its integral; $f=g$ a.e. ⇒ $\int f=\int g$.
+> 5. $f\ge0$ and $\int f\,d\mu=0$ ⇒ $f=0$ a.e.
+> 6. Lebesgue measure is translation invariant and $\lambda(cA)=\lvert c\rvert\lambda(A)$.
+> 7. In probability: "$X=a$ has probability $0$" does **not** mean impossible (every point of $[0,1]$ has probability $0$ under the uniform distribution, but one of them occurs).
 
-**Worked example (factory).** Machine M1 makes 60% of items, 3% of them are defective. Machine M2 makes 40%, 5% defective. An item is defective ($D$). Probability it came from M2?
-1. Total probability: $P(D)=0.6\cdot0.03+0.4\cdot0.05=0.018+0.020=0.038$.
-2. Bayes: $P(M2\mid D)=\frac{0.020}{0.038}=\frac{10}{19}\approx0.526$.
-
-**Worked example (medical test).** 1% of people are ill. The test is positive for 99% of ill people and for 5% of healthy people.
-1. $P(+)=0.99\cdot0.01+0.05\cdot0.99=0.0099+0.0495=0.0594$.
-2. $P(\text{ill}\mid +)=\frac{0.0099}{0.0594}=\frac16\approx16.7\%$.
-3. Lesson: if the illness is rare, most positive tests are false positives.
-
-> **Trap:** $P(A\mid B)\neq P(B\mid A)$ in general. "99% of ill people test positive" is **not** "99% of positive people are ill".
+**Measurable function / random variable.** $f:(\Omega,\mathcal F)\to\mathbb R$ is **measurable** if $f^{-1}(B)\in\mathcal F$ for every Borel set $B$ (enough: $\{f\le c\}\in\mathcal F$ for all $c$). Continuous functions, monotone functions, limits, sums and products of measurable functions are measurable. A **random variable** is a measurable function on a probability space.
 
 ---
 
-## 4. Independence 🟢
+## 3. Riemann and Lebesgue integral 🟢
 
-**Meaning.** $A$ and $B$ are independent if knowing $B$ does not change the chance of $A$.
+**Idea.** Riemann cuts the **domain** into small intervals; Lebesgue cuts the **range** and asks "how big is the set where $f$ is about this value?"
 
-**Formula.**
-$$A,B\text{ independent}\iff P(A\cap B)=P(A)\,P(B)$$
-(Equivalent: $P(A\mid B)=P(A)$ when $P(B)>0$.)
+### Lebesgue integral in three steps
+1. **Simple function** $s=\sum_ia_i\mathbf 1_{A_i}$: $\int s\,d\mu=\sum_ia_i\,\mu(A_i)$.
+2. $f\ge0$ measurable: $\int f\,d\mu=\sup\{\int s\,d\mu:0\le s\le f\text{ simple}\}$ (may be $\infty$).
+3. General $f=f^+-f^-$: $\int f=\int f^+-\int f^-$; $f$ is **integrable** ⇔ $\int\lvert f\rvert<\infty$.
 
-**Facts.**
-- If $A,B$ are independent, then also $A$ and $B^c$, $A^c$ and $B$, $A^c$ and $B^c$ are independent.
-- For independent events: $P(A\cup B)=1-(1-P(A))(1-P(B))$.
-- Three events $A,B,C$ are (mutually) independent if all pairs **and** the triple satisfy the product rule. Pairwise independence alone is not enough.
+With counting measure on $\mathbb N$, the integral is the sum $\sum f(n)$.
 
-**Worked example.** $P(A)=0.5$, $P(B)=0.4$, independent.
-1. $P(A\cap B)=0.5\cdot0.4=0.2$.
-2. $P(A\cup B)=0.5+0.4-0.2=0.7$.
+### Riemann vs Lebesgue
+> **Must-know facts**
+> 1. Proper Riemann integrable on $[a,b]$ ⇒ Lebesgue integrable, **same value**.
+> 2. **Lebesgue's criterion:** $f$ is Riemann integrable on $[a,b]$ ⇔ $f$ is bounded and continuous a.e.
+> 3. **Dirichlet function** $\mathbf 1_{\mathbb Q}$ on $[0,1]$: discontinuous everywhere ⇒ not Riemann integrable; Lebesgue integral $=1\cdot\lambda(\mathbb Q\cap[0,1])=0$.
+> 4. Improper Riemann integrals can exist without Lebesgue integrability: $\int_0^\infty\frac{\sin x}{x}dx=\frac\pi2$ (improper), but $\int_0^\infty\left\lvert\frac{\sin x}{x}\right\rvert dx=\infty$.
+> 5. Lebesgue integral behaves well with limits — this is its main advantage.
 
-**Disjoint vs independent.** $A$, $B$ disjoint with $P(A)=0.3$, $P(B)=0.4$:
-$P(A\cap B)=0$, but $P(A)P(B)=0.12$. So they are **not** independent. (If $A$ happens, we know $B$ did not happen.)
-
-> **Trap:** "disjoint" and "independent" are different. Disjoint events with positive probabilities are always **dependent**.
-
----
-
-## 5. Discrete random variables 🟢
-
-**Meaning.** A random variable $X$ is a number that depends on chance. "Discrete" means $X$ takes only a list of values (like $0,1,2,\dots$).
-
-**Formulas.**
-- **PMF** (probability mass function): $p(k)=P(X=k)$, with $p(k)\ge0$ and $\sum_k p(k)=1$.
-- **CDF** (cumulative distribution function): $F(x)=P(X\le x)$.
-- $P(a<X\le b)=F(b)-F(a)$.
-
-**Worked example (official problem 14 idea).** Roll two dice. Let $M=\max$ of the two numbers. Find the PMF.
-1. $M\le k$ means **both** dice are $\le k$: $P(M\le k)=\frac{k}{6}\cdot\frac{k}{6}=\frac{k^2}{36}$.
-2. $P(M=k)=P(M\le k)-P(M\le k-1)=\frac{k^2-(k-1)^2}{36}=\frac{2k-1}{36}$.
-3. So $P(M=1)=\frac1{36}$, $P(M=2)=\frac3{36}$, …, $P(M=6)=\frac{11}{36}$. Sum $=\frac{36}{36}=1$ ✓.
-
-**CDF properties:** $F$ is non-decreasing, right-continuous, goes from $0$ (at $-\infty$) to $1$ (at $+\infty$). For discrete $X$ it is a step function; the jump at $k$ is $P(X=k)$.
-
-> **Trap:** for discrete $X$, $P(X<k)$ and $P(X\le k)$ are **different** (they differ by $P(X=k)$).
-
----
-
-## 6. Continuous random variables: PDF and CDF 🟢
-
-**Meaning.** A continuous $X$ can take any value in an interval. Its probabilities come from a **density** $f$ (PDF): probability = area under $f$.
-
-**Formulas.**
-$$P(a\le X\le b)=\int_a^b f(x)\,dx,\qquad f(x)\ge0,\qquad \int_{-\infty}^{\infty}f(x)\,dx=1$$
-$$F(x)=P(X\le x)=\int_{-\infty}^x f(t)\,dt,\qquad f(x)=F'(x)$$
-
-**Worked example (find the constant).** $f(x)=cx^2$ for $0\le x\le1$, else $0$. Find $c$ and $P(X\le\frac12)$.
-1. Total area must be 1: $\int_0^1 cx^2\,dx=\frac c3=1$, so $c=3$.
-2. $P(X\le\tfrac12)=\int_0^{1/2}3x^2\,dx=\left[x^3\right]_0^{1/2}=\frac18$.
-
-**Facts.**
-- $P(X=a)=0$ for every single point $a$. So $P(X\le a)=P(X<a)$.
-- $f(x)$ is **not** a probability. It can be bigger than 1. Example: $U[0,\frac12]$ has $f(x)=2$.
-
-> **Trap:** "$P(X=a)=0$" does **not** mean "$X=a$ is impossible". It only means the event is a null event.
-
----
-
-## 7. Expectation and variance 🟢
-
-**Meaning.** $E[X]$ = the long-run average value of $X$. $\operatorname{Var}(X)$ = how much $X$ spreads around its mean. $\sigma=\sqrt{\operatorname{Var}X}$ is the standard deviation (SD).
-
-**Formulas.**
-
-| | Discrete | Continuous |
+### Convergence theorems
+| Theorem | Assumption | Conclusion |
 |---|---|---|
-| $E[X]$ | $\sum_k k\,P(X=k)$ | $\int x\,f(x)\,dx$ |
-| $E[g(X)]$ | $\sum_k g(k)\,P(X=k)$ | $\int g(x)\,f(x)\,dx$ |
+| **Monotone convergence** | $0\le f_1\le f_2\le\dots$, $f_n\to f$ | $\int f_n\to\int f$ |
+| **Dominated convergence** | $f_n\to f$ a.e., $\lvert f_n\rvert\le g$ with $\int g<\infty$ | $\int f_n\to\int f$ |
+| **Fatou** | $f_n\ge0$ | $\int\liminf f_n\le\liminf\int f_n$ |
+| **Fubini / Tonelli** | $\int\lvert f\rvert<\infty$ / $f\ge0$ | iterated integrals in any order are equal |
 
-$$\operatorname{Var}(X)=E[(X-E X)^2]=E[X^2]-(E[X])^2$$
+**Worked example (why a dominating function is needed).** $f_n=n\cdot\mathbf 1_{(0,1/n)}$ on $[0,1]$.
+1. For each fixed $x>0$: $f_n(x)=0$ once $\frac1n<x$. So $f_n\to0$ pointwise.
+2. $\int f_n=n\cdot\frac1n=1$ for every $n$.
+3. $\lim\int f_n=1\ne0=\int\lim f_n$. No integrable $g$ dominates all $f_n$.
 
-**Rules** ($a,b$ are constants):
+### Expectation is a Lebesgue integral
+$$E[X]=\int_\Omega X\,dP=\int_{\mathbb R}x\,dP_X(x)=\begin{cases}\sum_kk\,P(X=k)&\text{discrete}\\\int x\,f(x)\,dx&\text{density}\end{cases}$$
+
+> **Trap:** "Riemann integrable ⇒ Lebesgue integrable" is true for **proper** integrals on $[a,b]$; for improper integrals it can fail (fact 4).
+
+---
+
+## 4. Conditional probability and Bayes 🟢
+
+$$P(A\mid B)=\frac{P(A\cap B)}{P(B)}\ (P(B)>0),\qquad P(A\cap B)=P(B)P(A\mid B).$$
+For a partition $B_1,\dots,B_n$ of $\Omega$:
+$$P(A)=\sum_iP(A\mid B_i)P(B_i)\quad\text{(total probability)},\qquad P(B_j\mid A)=\frac{P(A\mid B_j)P(B_j)}{P(A)}\quad\text{(Bayes)}.$$
+
+**Worked example (factory).** M1 makes 60% (3% defective), M2 makes 40% (5% defective).
+1. $P(D)=0.6\cdot0.03+0.4\cdot0.05=0.038$.
+2. $P(M2\mid D)=\frac{0.020}{0.038}=\frac{10}{19}\approx0.526$.
+
+**Worked example (medical test).** 1% ill; test positive for 99% of ill and 5% of healthy people.
+1. $P(+)=0.0099+0.0495=0.0594$.
+2. $P(\text{ill}\mid+)=\frac{0.0099}{0.0594}=\frac16$. Rare illness ⇒ most positives are false positives.
+
+> **Trap:** $P(A\mid B)\ne P(B\mid A)$.
+
+---
+
+## 5. Independence of events and random variables 🟢
+
+### Events
+$$A,B\text{ independent}\iff P(A\cap B)=P(A)P(B)\quad(\Leftrightarrow P(A\mid B)=P(A)\text{ if }P(B)>0).$$
+- Then $A,B^c$ and $A^c,B^c$ are also independent.
+- $A_1,\dots,A_n$ (mutually) independent: $P\left(\bigcap_{i\in I}A_i\right)=\prod_{i\in I}P(A_i)$ for **every** subset $I$. Pairwise independence is not enough.
+- **Disjoint ≠ independent:** disjoint with $P(A),P(B)>0$ ⇒ $P(A\cap B)=0\ne P(A)P(B)$ ⇒ dependent.
+
+### Random variables
+$X,Y$ are **independent** if
+$$P(X\in A,\ Y\in B)=P(X\in A)\,P(Y\in B)\quad\text{for all Borel sets }A,B.$$
+Equivalent, easier checks:
+| Case | Independent ⇔ |
+|---|---|
+| general | joint CDF factorizes: $F_{X,Y}(x,y)=F_X(x)F_Y(y)$ |
+| discrete | $P(X=x,Y=y)=P(X=x)P(Y=y)$ for all $x,y$ |
+| with densities | joint density factorizes: $f_{X,Y}(x,y)=f_X(x)f_Y(y)$ |
+
+> **Must-know facts**
+> 1. $X,Y$ independent ⇒ $g(X),h(Y)$ independent (measurable $g,h$).
+> 2. Independent ⇒ $E[XY]=E[X]E[Y]$, $\operatorname{Cov}(X,Y)=0$, $\operatorname{Var}(X+Y)=\operatorname{Var}X+\operatorname{Var}Y$.
+> 3. The density of $X+Y$ is the **convolution** $f_{X+Y}(z)=\int f_X(x)f_Y(z-x)\,dx$.
+> 4. **Uncorrelated ⇏ independent.** $X$ uniform on $\{-1,0,1\}$, $Y=X^2$: $\operatorname{Cov}(X,Y)=E[X^3]-E[X]E[X^2]=0$, but $P(X=0,Y=0)=\frac13\ne P(X=0)P(Y=0)=\frac19$.
+> 5. For **jointly normal** $(X,Y)$: uncorrelated ⇔ independent.
+
+**Worked example.** On $[0,1]^2$:
+- $f(x,y)=4xy=(2x)(2y)$ ⇒ independent, each with density $2x$.
+- $f(x,y)=x+y$: marginal $f_X(x)=x+\frac12$, and $(x+\frac12)(y+\frac12)\ne x+y$ ⇒ **not** independent.
+
+**Uniform on the square.** $X,Y\sim U[0,1]$ independent ⇒ $(X,Y)$ has density $1$ on $[0,1]^2$ ⇒ probability = **area**. Example: $P(\lvert X-Y\rvert<\frac12)=1-2\cdot\frac18=\frac34$ (two corner triangles of area $\frac18$ removed).
+
+> **Trap:** independence of random variables needs the product rule for **all** pairs of sets/values, not just one.
+
+---
+
+## 6. Random variables, distribution functions and densities 🟢
+
+**Distribution** of $X$: the probability measure $P_X(B)=P(X\in B)$ on $\mathbb R$.
+
+### Distribution function (CDF)
+$F(x)=P(X\le x)$. A function $F$ is a CDF ⇔
+1. non-decreasing,
+2. right-continuous,
+3. $\lim_{x\to-\infty}F=0$, $\lim_{x\to\infty}F=1$.
+
+- $P(a<X\le b)=F(b)-F(a)$.
+- $P(X=a)=F(a)-F(a^-)$ = size of the jump at $a$. Discrete $X$: step function.
+
+### Density (official example 1)
+$X$ has density $f$ if $P(X\in B)=\int_Bf(x)\,dx$. A function $f$ is a density ⇔
+$$f\ge0\quad\text{and}\quad\int_{-\infty}^\infty f(x)\,dx=1.$$
+- $F(x)=\int_{-\infty}^xf(t)\,dt$, and $f=F'$ wherever $f$ is continuous.
+- $f$ need **not** be bounded ($\frac1{2\sqrt x}$ on $(0,1]$), continuous, or $\le1$ ($U[0,\frac12]$ has $f=2$).
+- With a density, $P(X=a)=0$ for every $a$, so $F$ is continuous.
+- Not every distribution has a density: discrete distributions, the Cantor distribution (continuous $F$ but no density).
+
+**Worked example.** $f(x)=cx^2$ on $[0,1]$.
+1. $\int_0^1cx^2dx=\frac c3=1$ ⇒ $c=3$.
+2. $F(x)=x^3$ on $[0,1]$; $P(X\le\frac12)=\frac18$.
+
+**Worked example (discrete, max of two dice).** $M=\max$:
+1. $P(M\le k)=\left(\frac k6\right)^2$.
+2. $P(M=k)=\frac{k^2-(k-1)^2}{36}=\frac{2k-1}{36}$.
+
+**Transformation.** $Y=aX+b$, $a\ne0$: $f_Y(y)=\frac1{\lvert a\rvert}f_X\!\left(\frac{y-b}a\right)$.
+
+> **Trap:** $f(x)$ is not a probability; $F(x)$ is. For discrete $X$, $P(X<k)\ne P(X\le k)$.
+
+---
+
+## 7. Expectation, variance, moments 🟢
+
+| | Discrete | Density |
+|---|---|---|
+| $E[X]$ | $\sum kP(X=k)$ | $\int xf(x)\,dx$ |
+| $E[g(X)]$ | $\sum g(k)P(X=k)$ | $\int g(x)f(x)\,dx$ |
+
+$E[X]$ exists if $E\lvert X\rvert<\infty$. The **Cauchy** distribution ($f=\frac1{\pi(1+x^2)}$) has **no** mean.
+For $X\ge0$: $E[X]=\int_0^\infty P(X>t)\,dt$.
+
+$$\operatorname{Var}X=E[(X-EX)^2]=E[X^2]-(EX)^2,\qquad k\text{-th moment }E[X^k].$$
 
 | Rule | Needs independence? |
 |---|---|
-| $E[aX+b]=aE[X]+b$ | no |
-| $E[X+Y]=E[X]+E[Y]$ | **no** (always true) |
-| $E[XY]=E[X]\,E[Y]$ | yes |
-| $\operatorname{Var}(aX+b)=a^2\operatorname{Var}(X)$ | no |
-| $\operatorname{Var}(X+Y)=\operatorname{Var}X+\operatorname{Var}Y$ | yes (or uncorrelated) |
-| $\operatorname{Var}(X-Y)=\operatorname{Var}X+\operatorname{Var}Y$ | yes — note the **plus** |
-| $\operatorname{Var}(X+Y)=\operatorname{Var}X+\operatorname{Var}Y+2\operatorname{Cov}(X,Y)$ | general formula |
+| $E[aX+b]=aEX+b$, $E[X+Y]=EX+EY$ | no |
+| $E[XY]=EX\,EY$ | yes (or uncorrelated) |
+| $\operatorname{Var}(aX+b)=a^2\operatorname{Var}X$ | no |
+| $\operatorname{Var}(X\pm Y)=\operatorname{Var}X+\operatorname{Var}Y$ | yes — **plus** also for $X-Y$ |
+| $\operatorname{Var}(X+Y)=\operatorname{Var}X+\operatorname{Var}Y+2\operatorname{Cov}(X,Y)$ | general |
 
-Covariance: $\operatorname{Cov}(X,Y)=E[XY]-E[X]E[Y]$. Independent $\Rightarrow\operatorname{Cov}=0$. The converse is false.
+**Jensen:** $g$ convex ⇒ $g(E[X])\le E[g(X)]$ (e.g. $(EX)^2\le E[X^2]$).
 
-**Worked example (one die).**
-1. $E[X]=\frac{1+2+\dots+6}{6}=\frac{21}{6}=3.5$.
-2. $E[X^2]=\frac{1+4+9+16+25+36}{6}=\frac{91}{6}$.
-3. $\operatorname{Var}X=\frac{91}{6}-3.5^2=\frac{91}{6}-\frac{49}{4}=\frac{35}{12}\approx2.92$.
+**Worked examples**
+- Die: $E=3.5$, $E[X^2]=\frac{91}6$, $\operatorname{Var}=\frac{35}{12}$.
+- Max of two dice: $E[M]=\frac{1+6+15+28+45+66}{36}=\frac{161}{36}$; $E[\min]=7-\frac{161}{36}=\frac{91}{36}$.
+- $f=3x^2$ on $[0,1]$: $E=\frac34$, $E[X^2]=\frac35$, $\operatorname{Var}=\frac3{80}$.
+- $X,Y$ independent, $\operatorname{Var}X=1$, $\operatorname{Var}Y=2$: $\operatorname{Var}(2X-3Y)=4+18=22$.
 
-**Worked example (official problem 14: max of two dice).** Use the PMF from Section 5: $P(M=k)=\frac{2k-1}{36}$.
-$$E[M]=\frac{1\cdot1+2\cdot3+3\cdot5+4\cdot7+5\cdot9+6\cdot11}{36}=\frac{1+6+15+28+45+66}{36}=\frac{161}{36}\approx4.47$$
-Bonus: $\max+\min=$ sum of the dice, and $E[\text{sum}]=7$. So $E[\min]=7-\frac{161}{36}=\frac{91}{36}\approx2.53$.
-
-**Worked example (continuous).** $f(x)=3x^2$ on $[0,1]$.
-1. $E[X]=\int_0^1x\cdot3x^2\,dx=\frac34$.
-2. $E[X^2]=\int_0^13x^4\,dx=\frac35$.
-3. $\operatorname{Var}X=\frac35-\frac9{16}=\frac{3}{80}$.
-
-**Worked example (variance rule).** $X,Y$ independent, $\operatorname{Var}X=1$, $\operatorname{Var}Y=2$.
-$\operatorname{Var}(2X-3Y)=2^2\cdot1+(-3)^2\cdot2=4+18=22$.
-
-> **Trap:** $E[X^2]\neq(E[X])^2$ (the difference is the variance), and $E[1/X]\neq 1/E[X]$.
+> **Trap:** $E[X^2]\ne(EX)^2$ and $E[1/X]\ne1/E[X]$.
 
 ---
 
 ## 8. Standard distributions 🟢
 
-Here $q=1-p$. Learn the **mean** and **variance** columns by heart.
+$q=1-p$.
 
-| Name | Values | $P(X=k)$ or $f(x)$ | Mean | Variance | Typical use |
-|---|---|---|---|---|---|
-| Bernoulli$(p)$ | $0,1$ | $P(1)=p,\ P(0)=q$ | $p$ | $pq$ | one yes/no trial |
-| Binomial$(n,p)$ | $0,\dots,n$ | $\binom nk p^kq^{n-k}$ | $np$ | $npq$ | successes in $n$ independent trials |
-| Geometric$(p)$ | $1,2,\dots$ | $q^{k-1}p$ | $\frac1p$ | $\frac{q}{p^2}$ | number of trials until first success |
-| Poisson$(\lambda)$ | $0,1,2,\dots$ | $e^{-\lambda}\frac{\lambda^k}{k!}$ | $\lambda$ | $\lambda$ | number of rare events in a time period |
-| Uniform$[a,b]$ | $[a,b]$ | $\frac1{b-a}$ | $\frac{a+b}2$ | $\frac{(b-a)^2}{12}$ | "any point equally likely" |
-| Exponential$(\lambda)$ | $[0,\infty)$ | $\lambda e^{-\lambda x}$ | $\frac1\lambda$ | $\frac1{\lambda^2}$ | waiting time |
-| Normal $N(\mu,\sigma^2)$ | $\mathbb R$ | $\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}$ | $\mu$ | $\sigma^2$ | sums and averages, measurement errors |
-
-**Useful extra facts.**
-- Exponential: $P(X>t)=e^{-\lambda t}$. It is **memoryless**: $P(X>s+t\mid X>s)=P(X>t)$.
-- Poisson: mean = variance $=\lambda$. Sum of independent Poisson$(\lambda)$ and Poisson$(\mu)$ is Poisson$(\lambda+\mu)$.
-- Normal: if $X\sim N(\mu,\sigma^2)$, then $Z=\frac{X-\mu}{\sigma}\sim N(0,1)$ (standard normal).
-
-**Worked example (Poisson).** On average 2 calls per hour. $P(\text{at most 1 call})=e^{-2}(1+2)=3e^{-2}\approx0.406$.
-
-**Worked example (Exponential).** Lifetime with mean 2 years, so $\lambda=\frac12$. $P(\text{lives more than 2 years})=e^{-2/2}=e^{-1}\approx0.368$.
-
-> **Trap:** Exponential$(\lambda)$ has mean $\frac1\lambda$, **not** $\lambda$. Uniform variance has **12** in the denominator.
-
----
-
-## 9. Geometric probability (areas) 🟢
-
-**Meaning.** If $X,Y\sim U[0,1]$ are independent, the point $(X,Y)$ is uniform in the unit square. Then
-$$P\big((X,Y)\in R\big)=\text{area of }R\quad(\text{because the square has area }1).$$
-
-**Method.**
-1. Draw the unit square.
-2. Draw the region $R$ described by the condition.
-3. Compute its area (often with triangles: area $=\frac12\cdot$ base $\cdot$ height).
-
-**Worked example (official problem 13).** $P(\lvert X-Y\rvert<\frac12)$.
-1. The "bad" region $\lvert x-y\rvert\ge\frac12$ is two corner triangles: one with $y\ge x+\frac12$, one with $y\le x-\frac12$.
-2. Each triangle has legs $\frac12$ and $\frac12$, so area $\frac12\cdot\frac12\cdot\frac12=\frac18$.
-3. $P=1-2\cdot\frac18=\frac34$.
-
-General rule: $P(\lvert X-Y\rvert<a)=1-(1-a)^2$ for $0\le a\le1$.
-
-**Worked example 2.** $P(X+Y\le\frac12)$.
-1. The region is the triangle with corners $(0,0),(\frac12,0),(0,\frac12)$.
-2. Area $=\frac12\cdot\frac12\cdot\frac12=\frac18$.
-
-**More results to remember** ($X,Y\sim U[0,1]$ independent):
-
-| Event | Probability |
-|---|---|
-| $X<Y$ | $\frac12$ (symmetry) |
-| $X+Y\le1$ | $\frac12$ |
-| $X+Y\le t$, $0\le t\le1$ | $\frac{t^2}2$ |
-| $\max(X,Y)\le t$ | $t^2$ |
-| $\min(X,Y)>t$ | $(1-t)^2$ |
-
-> **Trap:** the answer is an **area**, so it must be between 0 and 1. If you get more than 1, you counted a region twice.
-
----
-
-## 10. Central limit theorem and law of large numbers 🟢 / 🟡
-
-Let $X_1,\dots,X_n$ be **iid** (independent, identically distributed) with mean $\mu$ and variance $\sigma^2$.
-Let $S_n=X_1+\dots+X_n$ (sum) and $\bar X_n=\frac{S_n}{n}$ (sample mean).
-
-| | Mean | Variance | SD |
+| Name | $P(X=k)$ or $f(x)$ | Mean | Variance |
 |---|---|---|---|
-| Sum $S_n$ | $n\mu$ | $n\sigma^2$ | $\sigma\sqrt n$ |
-| Mean $\bar X_n$ | $\mu$ | $\frac{\sigma^2}{n}$ | $\frac{\sigma}{\sqrt n}$ |
+| Bernoulli$(p)$ | $P(1)=p$ | $p$ | $pq$ |
+| Binomial$(n,p)$ | $\binom nkp^kq^{n-k}$ | $np$ | $npq$ |
+| Geometric$(p)$ on $\{1,2,\dots\}$ | $q^{k-1}p$ | $\frac1p$ | $\frac q{p^2}$ |
+| Poisson$(\lambda)$ | $e^{-\lambda}\frac{\lambda^k}{k!}$ | $\lambda$ | $\lambda$ |
+| Uniform$[a,b]$ | $\frac1{b-a}$ | $\frac{a+b}2$ | $\frac{(b-a)^2}{12}$ |
+| Exponential$(\lambda)$ | $\lambda e^{-\lambda x}$, $x\ge0$ | $\frac1\lambda$ | $\frac1{\lambda^2}$ |
+| Normal $N(\mu,\sigma^2)$ | $\frac1{\sigma\sqrt{2\pi}}e^{-(x-\mu)^2/(2\sigma^2)}$ | $\mu$ | $\sigma^2$ |
 
-### Central limit theorem (CLT) 🟢
-**Meaning.** For large $n$, the sum (or the mean) is approximately **normal**, whatever the distribution of the $X_i$ is.
-$$S_n\approx N(n\mu,\,n\sigma^2),\qquad \bar X_n\approx N\!\left(\mu,\,\frac{\sigma^2}{n}\right)$$
+- Exponential: $P(X>t)=e^{-\lambda t}$, **memoryless**.
+- Sum of independent Poisson$(\lambda)$ and Poisson$(\mu)$ is Poisson$(\lambda+\mu)$; sum of independent normals is normal.
+- $Z=\frac{X-\mu}\sigma\sim N(0,1)$.
 
-**Recipe.** 1) Find mean and SD of the sum or mean. 2) Compute $z=\frac{\text{value}-\text{mean}}{\text{SD}}$. 3) Read $\Phi(z)$ from the table.
+**Examples.** Poisson(2): $P(X\le1)=3e^{-2}$. Exponential with mean 2: $P(X>2)=e^{-1}$.
 
-**Small z-table** ($\Phi(z)=P(Z\le z)$, $Z\sim N(0,1)$; $\Phi(-z)=1-\Phi(z)$):
+> **Trap:** Exponential$(\lambda)$ has mean $\frac1\lambda$; uniform variance has a $12$.
 
-| $z$ | 0 | 1 | 1.1 | 1.5 | 1.645 | 1.96 | 2 | 2.576 | 3 |
-|---|---|---|---|---|---|---|---|---|---|
-| $\Phi(z)$ | 0.5 | 0.8413 | 0.8643 | 0.9332 | 0.95 | 0.975 | 0.9772 | 0.995 | 0.9987 |
+---
 
-**Worked example (sample mean).** Light bulbs: mean life 1000 h, SD 100 h. Sample of $n=25$. $P(\bar X<960)$?
-1. SD of $\bar X$: $\frac{100}{\sqrt{25}}=20$.
+## 9. Laws of large numbers 🟢
+
+Setting: $X_1,X_2,\dots$ **iid** with mean $\mu$, $\bar X_n=\frac1n\sum_{k=1}^nX_k$.
+
+### Inequalities (the tools)
+- **Markov:** $X\ge0$ ⇒ $P(X\ge a)\le\frac{E[X]}a$.
+- **Chebyshev:** $P(\lvert X-\mu\rvert\ge k\sigma)\le\frac1{k^2}$ (so at least $\frac34$ within $2\sigma$, $\frac89$ within $3\sigma$ — for **every** distribution).
+
+### The laws (official example 2)
+| Law | Statement | Mode of convergence |
+|---|---|---|
+| **Weak LLN** | $P(\lvert\bar X_n-\mu\rvert>\varepsilon)\to0$ for every $\varepsilon>0$ | in probability |
+| **Strong LLN** (Kolmogorov) | $P\left(\lim_{n\to\infty}\bar X_n=\mu\right)=1$, i.e. $\bar X_n\to E[X_1]$ **almost surely** | almost surely |
+
+Both need iid with $E\lvert X_1\rvert<\infty$.
+
+**Proof of the weak LLN (finite variance).** $\operatorname{Var}\bar X_n=\frac{\sigma^2}n$. Chebyshev: $P(\lvert\bar X_n-\mu\rvert>\varepsilon)\le\frac{\sigma^2}{n\varepsilon^2}\to0$.
+
+### Modes of convergence
+$$\text{almost surely}\ \Rightarrow\ \text{in probability}\ \Rightarrow\ \text{in distribution},\qquad L^p\Rightarrow\text{in probability}.$$
+The arrows do not go back (except: in distribution to a **constant** ⇒ in probability).
+
+> **Must-know facts**
+> 1. **Borel–Cantelli:** $\sum P(A_n)<\infty$ ⇒ $P(A_n\text{ happens infinitely often})=0$.
+> 2. Without a finite mean the LLN fails: the mean of $n$ iid Cauchy variables is again Cauchy.
+> 3. The LLN is the reason relative frequencies estimate probabilities. It does **not** say "after many tails, heads is due" (gambler's fallacy).
+
+> **Trap:** weak = in probability, strong = almost surely. "Converges in distribution" is the CLT type of statement.
+
+---
+
+## 10. Central limit theorem 🟢
+
+$X_1,X_2,\dots$ iid, mean $\mu$, variance $0<\sigma^2<\infty$, $S_n=\sum X_k$:
+$$\frac{S_n-n\mu}{\sigma\sqrt n}=\frac{\bar X_n-\mu}{\sigma/\sqrt n}\ \xrightarrow{\ d\ }\ N(0,1).$$
+So for large $n$: $S_n\approx N(n\mu,n\sigma^2)$, $\bar X_n\approx N\!\left(\mu,\frac{\sigma^2}n\right)$, whatever the distribution of $X_i$.
+
+| | Mean | SD |
+|---|---|---|
+| $S_n$ | $n\mu$ | $\sigma\sqrt n$ |
+| $\bar X_n$ | $\mu$ | $\frac\sigma{\sqrt n}$ |
+
+**De Moivre–Laplace:** Binomial$(n,p)\approx N(np,npq)$ for large $n$.
+
+**Values:** $\Phi(1)=0.8413$, $\Phi(1.645)=0.95$, $\Phi(1.96)=0.975$, $\Phi(2)=0.9772$, $\Phi(-z)=1-\Phi(z)$.
+
+**Worked example.** Mean life 1000 h, SD 100 h, $n=25$. $P(\bar X<960)$?
+1. SD of $\bar X$: $\frac{100}5=20$.
 2. $z=\frac{960-1000}{20}=-2$.
-3. $P=\Phi(-2)=1-0.9772=0.0228$.
+3. $\Phi(-2)=0.0228$.
 
-**Worked example (coins).** 100 fair coins. $X$ = number of heads. $\mu=np=50$, $\sigma=\sqrt{npq}=\sqrt{25}=5$.
-$P(X\le 60)\approx\Phi\left(\frac{60-50}{5}\right)=\Phi(2)=0.977$.
+**Coins.** 100 fair coins: $\mu=50$, $\sigma=5$; $P(X\le60)\approx\Phi(2)=0.977$.
 
-> **Trap:** for the mean use $\frac{\sigma}{\sqrt n}$, not $\sigma$. Forgetting $\sqrt n$ is the most common mistake.
-
-### Law of large numbers (LLN) 🟡
-
-> **Must-know facts**
-> - LLN: $\bar X_n\to\mu$ as $n\to\infty$ (the sample mean approaches the true mean).
-> - Weak LLN = convergence in probability; strong LLN = almost sure convergence. Both need a **finite mean**.
-> - CLT needs a **finite variance**. The $X_i$ do **not** need to be normal.
-> - Modes of convergence: almost sure $\Rightarrow$ in probability $\Rightarrow$ in distribution. The arrows do **not** go back.
-> - LLN does **not** mean "after many tails, heads is more likely" (gambler's fallacy).
-
----
-
-## 11. Markov and Chebyshev inequalities 🟡
-
-> **Must-know facts**
-> - **Markov:** if $X\ge0$, then $P(X\ge a)\le\frac{E[X]}{a}$. Example: $E[X]=2$ gives $P(X\ge10)\le0.2$.
-> - **Chebyshev:** $P(\lvert X-\mu\rvert\ge k\sigma)\le\frac1{k^2}$. Equivalent: $P(\lvert X-\mu\rvert<k\sigma)\ge1-\frac1{k^2}$.
-> - $k=2$: at least $\frac34$ of the probability is within $2\sigma$. $k=3$: at least $\frac89$.
-> - Chebyshev works for **every** distribution, so it is weaker than the normal 95% / 99.7% rule.
-> - Markov needs $X\ge0$.
-
----
-
-## 12. Null sets and measure theory 🟡
-
-**Short idea.** The **Lebesgue measure** $\lambda$ gives the "length" of a set of real numbers: $\lambda([a,b])=b-a$. A **null set** (zero-measure set) is a set with length 0. "Almost everywhere (a.e.)" or "almost surely (a.s.)" means "except on a null set".
-
-> **Must-know facts**
-> - Every single point has measure 0. Every **countable** set has measure 0: $\mathbb N$, $\mathbb Z$, $\mathbb Q$. So $\lambda(\mathbb Q\cap[0,1])=0$ and $\lambda([0,1]\setminus\mathbb Q)=1$.
-> - The **Cantor set** has measure 0 but is **uncountable**. So "measure 0" does not imply "countable".
-> - A countable union of null sets is a null set. A line in $\mathbb R^2$ has area 0.
-> - The Dirichlet function $1_{\mathbb Q}$ on $[0,1]$ is **not** Riemann integrable, but its Lebesgue integral is $0$.
-> - Changing a function on a null set does not change its integral.
-> - A σ-algebra contains $\Omega$ and is closed under complements and **countable** unions. A probability measure is a measure with $P(\Omega)=1$.
+> **Trap:** for the mean use $\frac\sigma{\sqrt n}$. The CLT needs finite **variance**; the $X_i$ need not be normal.
 
 ---
 
 ## Formula sheet
 
-| Topic | Formula |
+| Topic | Formula / fact |
 |---|---|
-| Laplace | $P(A)=\frac{\lvert A\rvert}{\lvert\Omega\rvert}$ |
-| Complement | $P(A^c)=1-P(A)$ |
-| Union | $P(A\cup B)=P(A)+P(B)-P(A\cap B)$ |
-| Union bound | $P(\bigcup A_i)\le\sum P(A_i)$ |
-| At least one | $1-P(\text{none})$ |
-| Conditional | $P(A\mid B)=\frac{P(A\cap B)}{P(B)}$ |
-| Total probability | $P(A)=\sum_i P(A\mid B_i)P(B_i)$ |
-| Bayes | $P(B\mid A)=\frac{P(A\mid B)P(B)}{P(A)}$ |
-| Independence | $P(A\cap B)=P(A)P(B)$ |
-| Density | $f\ge0$, $\int f=1$, $P(a\le X\le b)=\int_a^bf$ |
-| CDF | $F(x)=P(X\le x)$, $f=F'$ |
-| Expectation | $E[X]=\sum k\,p(k)$ or $\int x f(x)\,dx$ |
-| Variance | $\operatorname{Var}X=E[X^2]-(EX)^2$ |
-| Linear rules | $E[aX+b]=aEX+b$, $\operatorname{Var}(aX+b)=a^2\operatorname{Var}X$ |
-| Sum (independent) | $\operatorname{Var}(aX+bY)=a^2\operatorname{Var}X+b^2\operatorname{Var}Y$ |
-| Max of 2 dice | $P(M=k)=\frac{2k-1}{36}$, $E[M]=\frac{161}{36}$ |
-| Uniform square | probability = area; $P(\lvert X-Y\rvert<a)=1-(1-a)^2$ |
-| Sum of $n$ iid | mean $n\mu$, SD $\sigma\sqrt n$ |
-| Mean of $n$ iid | mean $\mu$, SD $\sigma/\sqrt n$ |
-| Standardize | $z=\frac{x-\mu}{\sigma}$ |
+| σ-algebra | $\Omega\in\mathcal F$; complements; countable unions |
+| Measure | $\mu(\emptyset)=0$; countably additive |
+| Probability space | $(\Omega,\mathcal F,P)$, $P(\Omega)=1$ |
+| Null sets | countable sets; Cantor set (uncountable) |
+| Riemann vs Lebesgue | R-integrable ⇔ bounded + continuous a.e.; $\int\mathbf 1_{\mathbb Q}=0$ |
+| DCT | $f_n\to f$, $\lvert f_n\rvert\le g\in L^1$ ⇒ $\int f_n\to\int f$ |
+| Conditional / Bayes | $P(A\mid B)=\frac{P(A\cap B)}{P(B)}$; $P(B_j\mid A)=\frac{P(A\mid B_j)P(B_j)}{\sum_iP(A\mid B_i)P(B_i)}$ |
+| Independent events | $P(A\cap B)=P(A)P(B)$ |
+| Independent RVs | $F_{X,Y}=F_XF_Y$; $f_{X,Y}=f_Xf_Y$ |
+| CDF | non-decreasing, right-continuous, $0\to1$; jump = $P(X=a)$ |
+| Density | $f\ge0$, $\int f=1$ |
+| Expectation | $E[X]=\int X\,dP$; $\sum kp(k)$ or $\int xf(x)dx$ |
+| Variance | $E[X^2]-(EX)^2$; $\operatorname{Var}(aX+b)=a^2\operatorname{Var}X$ |
 | Chebyshev | $P(\lvert X-\mu\rvert\ge k\sigma)\le\frac1{k^2}$ |
+| Weak / strong LLN | $\bar X_n\to\mu$ in probability / almost surely |
+| CLT | $\frac{S_n-n\mu}{\sigma\sqrt n}\to N(0,1)$ in distribution |
+| Convergence | a.s. ⇒ in prob. ⇒ in distribution |
 
 ---
 
 ## Practice MCQs
 
-**Q1.** A fair die is rolled once. What is $P(\text{even number})$?
-- A) $\frac13$
-- B) $\frac12$
-- C) $\frac23$
-- D) $\frac16$
+**Q1.** (official example 1) A density $f(x)$ of a continuous random variable must satisfy
+A) $f(x)\le0$  B) $\int_{-\infty}^\infty f(x)\,dx=1$  C) $f(x)$ is constant  D) $f(x)$ is differentiable  E) $f(x)$ is bounded
 
 <details><summary>Answer</summary>
 
-**B** — Good outcomes: 2, 4, 6. So $P=\frac36=\frac12$.
+**B** — Non-negative and integrating to 1. It need not be constant, differentiable or bounded.
 
 </details>
 
-**Q2.** Two fair dice are rolled. What is $P(\text{sum}=7)$?
-- A) $\frac16$
-- B) $\frac1{12}$
-- C) $\frac7{36}$
-- D) $\frac1{11}$
+**Q2.** (official example 2) $(X_n)$ satisfies the strong law of large numbers if
+A) $X_n$ converges in distribution  B) $\frac1n\sum_{k=1}^nX_k$ converges almost surely to $E[X_1]$  C) $\frac1n\sum_{k=1}^nX_k$ converges in probability to $0$  D) $X_n$ is bounded  E) $X_n$ has zero variance
 
 <details><summary>Answer</summary>
 
-**A** — 6 good pairs out of 36: $\frac6{36}=\frac16$. ($\frac1{11}$ wrongly treats the 11 possible sums as equally likely.)
+**B** — Strong = almost sure convergence of the sample mean to the expectation. Convergence in probability is the weak law.
 
 </details>
 
-**Q3.** $P(A)=0.5$, $P(B)=0.4$, $P(A\cap B)=0.2$. What is $P(A\cup B)$?
-- A) $0.9$
-- B) $0.2$
-- C) $0.3$
-- D) $0.7$
+**Q3.** Which family is a σ-algebra on $\Omega=\{1,2,3\}$?
+A) $\{\emptyset,\{1\},\Omega\}$  B) $\{\emptyset,\{1\},\{2,3\},\Omega\}$  C) $\{\{1\},\{2\},\{3\}\}$  D) $\{\emptyset,\{1\},\{2\},\Omega\}$  E) $\{\emptyset,\{1,2\},\{2,3\},\Omega\}$
 
 <details><summary>Answer</summary>
 
-**D** — $0.5+0.4-0.2=0.7$.
+**B** — A misses $\{2,3\}$; C misses $\Omega$; D misses $\{2,3\}$ and $\{1,2\}$; E misses $\{3\}$, $\{1\}$, $\{2\}$.
 
 </details>
 
-**Q4.** A coin is tossed 3 times. What is $P(\text{at least one head})$?
-- A) $\frac12$
-- B) $\frac78$
-- C) $\frac38$
-- D) $\frac34$
+**Q4.** A σ-algebra is closed under
+A) finite unions only  B) complements and countable unions  C) arbitrary (uncountable) unions  D) complements only  E) Cartesian products
 
 <details><summary>Answer</summary>
 
-**B** — $P(\text{no head})=\left(\frac12\right)^3=\frac18$. So $1-\frac18=\frac78$.
+**B** — By definition (plus $\Omega\in\mathcal F$). Uncountable unions are not required.
 
 </details>
 
-**Q5.** $X$ is a fair die roll. $E[X]=$
-- A) $3$
-- B) $4$
-- C) $3.5$
-- D) $\frac{35}{12}$
+**Q5.** How many elements has the smallest σ-algebra containing a set $A$ with $\emptyset\ne A\ne\Omega$?
+A) $1$  B) $2$  C) $3$  D) $4$  E) $2^{\lvert\Omega\rvert}$
 
 <details><summary>Answer</summary>
 
-**C** — $\frac{1+2+\dots+6}{6}=\frac{21}6=3.5$. ($\frac{35}{12}$ is the variance.)
+**D** — $\{\emptyset,A,A^c,\Omega\}$.
 
 </details>
 
-**Q6.** $X\sim U[0,4]$. What is $P(X\le1)$?
-- A) $\frac12$
-- B) $1$
-- C) $\frac13$
-- D) $\frac14$
+**Q6.** A probability space is
+A) a set with a metric  B) a triple $(\Omega,\mathcal F,P)$ with $\mathcal F$ a σ-algebra and $P$ a measure with $P(\Omega)=1$  C) any finite set  D) a pair $(\Omega,P)$ with $P$ defined on all subsets of $\mathbb R$  E) a vector space with an inner product
 
 <details><summary>Answer</summary>
 
-**D** — Density $\frac14$ on $[0,4]$. Area from 0 to 1: $1\cdot\frac14=\frac14$.
+**B** — Kolmogorov's definition. On $\mathbb R$, $P$ cannot in general be defined on all subsets (D).
 
 </details>
 
-**Q7.** $\operatorname{Var}(X)=4$. What is $\operatorname{Var}(2X+3)$?
-- A) $16$
-- B) $8$
-- C) $11$
-- D) $19$
+**Q7.** The Lebesgue measure of $\mathbb Q\cap[0,1]$ is
+A) $0$  B) $1$  C) $\frac12$  D) not defined, because $\mathbb Q$ is dense  E) $\infty$
 
 <details><summary>Answer</summary>
 
-**A** — $\operatorname{Var}(aX+b)=a^2\operatorname{Var}X=4\cdot4=16$. The $+3$ does not change the spread.
+**A** — Countable sets are null sets.
 
 </details>
 
-**Q8.** $X\sim\text{Binomial}(10,\,0.3)$. What is $E[X]$?
-- A) $0.3$
-- B) $2.1$
-- C) $7$
-- D) $3$
+**Q8.** The Cantor set is
+A) countable with measure $0$  B) uncountable with measure $0$  C) uncountable with measure $1$  D) not measurable  E) open
 
 <details><summary>Answer</summary>
 
-**D** — $E[X]=np=10\cdot0.3=3$. ($2.1=npq$ is the variance.)
+**B** — It shows that "measure 0" does not imply "countable".
 
 </details>
 
-**Q9.** Which statement is the union bound?
-- A) $P(A\cup B)=P(A)+P(B)$ always
-- B) $P(A_1\cup\dots\cup A_n)\le P(A_1)+\dots+P(A_n)$
-- C) $P(A\cap B)\le P(A)P(B)$
-- D) $P(A\cup B)\ge P(A)+P(B)$
+**Q9.** The Dirichlet function $\mathbf 1_{\mathbb Q}$ on $[0,1]$ is
+A) Riemann integrable with integral $0$  B) Riemann integrable with integral $1$  C) not Riemann integrable; Lebesgue integral $0$  D) not Lebesgue integrable  E) continuous almost everywhere
 
 <details><summary>Answer</summary>
 
-**B** — From $P(A\cup B)=P(A)+P(B)-P(A\cap B)$ and $P(A\cap B)\ge0$, then induction. A is only true for disjoint events.
+**C** — It is discontinuous everywhere, so not Riemann integrable; it equals $0$ a.e., so its Lebesgue integral is $0$.
 
 </details>
 
-**Q10.** $A$ and $B$ are disjoint, $P(A)=0.3$, $P(B)=0.4$. Which is true?
-- A) $A$ and $B$ are independent
-- B) $P(A\cup B)=0.58$
-- C) $A$ and $B$ are not independent
-- D) $P(A\mid B)=0.3$
+**Q10.** The dominated convergence theorem needs, besides $f_n\to f$ a.e.,
+A) $f_n$ increasing  B) $\lvert f_n\rvert\le g$ for one integrable $g$  C) $f_n$ continuous  D) $f_n$ Riemann integrable  E) $\int f_n$ bounded
 
 <details><summary>Answer</summary>
 
-**C** — $P(A\cap B)=0$, but $P(A)P(B)=0.12\neq0$. Also $P(A\cup B)=0.7$ and $P(A\mid B)=0$.
+**B** — A is monotone convergence. E is not enough: see Q11.
 
 </details>
 
-**Q11.** $f(x)=cx^2$ for $0\le x\le1$ (else 0) is a density. What are $c$ and $E[X]$?
-- A) $c=3$, $E[X]=\frac34$
-- B) $c=2$, $E[X]=\frac23$
-- C) $c=1$, $E[X]=\frac13$
-- D) $c=3$, $E[X]=\frac12$
+**Q11.** $f_n=n\,\mathbf 1_{(0,1/n)}$ on $[0,1]$. Which is true?
+A) $f_n\to0$ pointwise and $\int f_n\to0$  B) $f_n\to0$ pointwise but $\int f_n=1$ for all $n$  C) $f_n\to\infty$ pointwise  D) $\int f_n=n$  E) $f_n$ is not measurable
 
 <details><summary>Answer</summary>
 
-**A** — $\int_0^1cx^2dx=\frac c3=1\Rightarrow c=3$. $E[X]=\int_0^13x^3dx=\frac34$.
+**B** — Limit and integral cannot be swapped here; no integrable dominating function exists.
 
 </details>
 
-**Q12.** Machine M1 makes 60% of the items (3% defective), M2 makes 40% (5% defective). An item is defective. $P(\text{from M2})\approx$
-- A) $0.40$
-- B) $0.05$
-- C) $0.038$
-- D) $0.526$
+**Q12.** $P(A)=0.5$, $P(B)=0.4$, $P(A\cap B)=0.2$. $P(A\cup B)=$
+A) $0.9$  B) $0.2$  C) $0.3$  D) $0.7$  E) $0.1$
 
 <details><summary>Answer</summary>
 
-**D** — $P(D)=0.6\cdot0.03+0.4\cdot0.05=0.038$. Bayes: $\frac{0.020}{0.038}=\frac{10}{19}\approx0.526$.
+**D** — Inclusion–exclusion. (Here also $P(A\cap B)=P(A)P(B)$: independent.)
 
 </details>
 
-**Q13.** $X,Y\sim U[0,1]$ independent. $P(\lvert X-Y\rvert<\frac12)=$
-- A) $\frac12$
-- B) $\frac14$
-- C) $\frac34$
-- D) $\frac78$
+**Q13.** M1 makes 60% of items (3% defective), M2 40% (5% defective). Given defective, $P(\text{M2})\approx$
+A) $0.40$  B) $0.05$  C) $0.038$  D) $0.526$  E) $0.02$
 
 <details><summary>Answer</summary>
 
-**C** — The complement is two corner triangles, each of area $\frac12\cdot\frac12\cdot\frac12=\frac18$. So $1-\frac14=\frac34$.
+**D** — $\frac{0.020}{0.038}$.
 
 </details>
 
-**Q14.** Two fair dice are rolled. $E[\max]=$
-- A) $\frac{91}{36}$
-- B) $\frac{161}{36}$
-- C) $\frac72$
-- D) $5$
+**Q14.** 1% ill; test positive for 99% of ill and 5% of healthy people. $P(\text{ill}\mid+)\approx$
+A) $0.99$  B) $0.95$  C) $\frac16$  D) $0.01$  E) $0.05$
 
 <details><summary>Answer</summary>
 
-**B** — $P(\max=k)=\frac{2k-1}{36}$. $\sum k(2k-1)=1+6+15+28+45+66=161$. ($\frac{91}{36}$ is $E[\min]$.)
+**C** — $\frac{0.0099}{0.0594}$.
 
 </details>
 
-**Q15.** $X,Y$ independent, $\operatorname{Var}X=1$, $\operatorname{Var}Y=2$. $\operatorname{Var}(2X-3Y)=$
-- A) $22$
-- B) $-14$
-- C) $14$
-- D) $8$
+**Q15.** $A,B$ disjoint, $P(A)=0.3$, $P(B)=0.4$. Then
+A) $A,B$ are independent  B) $P(A\cup B)=0.58$  C) $A,B$ are not independent  D) $P(A\mid B)=0.3$  E) $P(A\cap B)=0.12$
 
 <details><summary>Answer</summary>
 
-**A** — $2^2\cdot1+(-3)^2\cdot2=4+18=22$. Variances add, even for a difference.
+**C** — $0\ne0.12$.
 
 </details>
 
-**Q16.** $X\sim\text{Exponential}(\lambda=2)$. $P(X>1)=$
-- A) $e^{-1/2}$
-- B) $1-e^{-2}$
-- C) $2e^{-2}$
-- D) $e^{-2}$
+**Q16.** Random variables $X,Y$ with joint density $f_{X,Y}$ are independent if and only if
+A) $\operatorname{Cov}(X,Y)=0$  B) $f_{X,Y}(x,y)=f_X(x)f_Y(y)$ for (almost) all $x,y$  C) $E[X]=E[Y]$  D) $f_{X,Y}$ is symmetric  E) $X+Y$ has a density
 
 <details><summary>Answer</summary>
 
-**D** — $P(X>t)=e^{-\lambda t}=e^{-2\cdot1}=e^{-2}\approx0.135$.
+**B** — A is only necessary (uncorrelated ⇏ independent).
 
 </details>
 
-**Q17.** A population has mean 1000 and SD 100. For a sample of size $n=25$, $P(\bar X<960)\approx$
-- A) $0.3446$
-- B) $0.0228$
-- C) $0.1587$
-- D) $0.0013$
+**Q17.** $X$ uniform on $\{-1,0,1\}$, $Y=X^2$. Then $X$ and $Y$ are
+A) independent and uncorrelated  B) uncorrelated but not independent  C) correlated and independent  D) correlated and not independent  E) identically distributed
 
 <details><summary>Answer</summary>
 
-**B** — SD of $\bar X$ is $\frac{100}{\sqrt{25}}=20$. $z=\frac{960-1000}{20}=-2$. $\Phi(-2)=0.0228$.
+**B** — $\operatorname{Cov}=E[X^3]-0=0$, but $P(X=0,Y=0)=\frac13\ne\frac13\cdot\frac13$.
 
 </details>
 
-**Q18.** $X\sim\text{Poisson}(2)$. $P(X\le1)=$
-- A) $e^{-2}$
-- B) $2e^{-2}$
-- C) $3e^{-2}$
-- D) $1-e^{-2}$
+**Q18.** On $[0,1]^2$, which joint density makes $X$ and $Y$ independent?
+A) $x+y$  B) $4xy$  C) $2$ on $\{y\le x\}$, $0$ else  D) $\frac32(x^2+y^2)$  E) $\frac{12}7(x^2+xy)$
 
 <details><summary>Answer</summary>
 
-**C** — $P(0)+P(1)=e^{-2}+2e^{-2}=3e^{-2}\approx0.406$.
+**B** — $4xy=(2x)(2y)$. C lives on a triangle — knowing $X$ restricts $Y$.
 
 </details>
 
-**Q19.** By Chebyshev, $P(\lvert X-\mu\rvert<2\sigma)$ is at least
-- A) $\frac12$
-- B) $0.95$
-- C) $\frac14$
-- D) $\frac34$
+**Q19.** Which function **cannot** be a distribution function?
+A) $F(x)=0$ for $x<0$, $1$ for $x\ge0$  B) $F(x)=1-e^{-x}$ for $x\ge0$, $0$ else  C) $F(x)=\frac12+\frac1\pi\arctan x$  D) $F(x)=e^{-x^2}$  E) $F(x)=\min(\max(x,0),1)$
 
 <details><summary>Answer</summary>
 
-**D** — $1-\frac1{2^2}=\frac34$. (0.95 is only true for the normal distribution.)
+**D** — It decreases for $x>0$ and tends to $0$ at $+\infty$. A: point mass at $0$; B: exponential; C: Cauchy; E: uniform.
 
 </details>
 
-**Q20.** What is the Lebesgue measure of $\mathbb Q\cap[0,1]$?
-- A) $0$
-- B) $1$
-- C) $\frac12$
-- D) not defined, because $\mathbb Q$ is dense
+**Q20.** If $F$ is the CDF of $X$, then $P(X=a)=$
+A) $F(a)$  B) $F(a)-F(a^-)$  C) $1-F(a)$  D) $F'(a)$  E) always $0$
 
 <details><summary>Answer</summary>
 
-**A** — The set is countable. Every countable set has Lebesgue measure 0.
+**B** — The jump of $F$ at $a$. It is $0$ only if $F$ is continuous at $a$.
 
 </details>
 
-**Q21.** 1% of people have a disease. The test is positive for 99% of ill people and for 5% of healthy people. A person tests positive. $P(\text{ill})\approx$
-- A) $0.99$
-- B) $0.95$
-- C) $\frac16$
-- D) $0.01$
+**Q21.** $f(x)=cx^2$ on $[0,1]$ is a density. $c$ and $E[X]$ are
+A) $c=3$, $E[X]=\frac34$  B) $c=2$, $E[X]=\frac23$  C) $c=1$, $E[X]=\frac13$  D) $c=3$, $E[X]=\frac12$  E) $c=\frac13$, $E[X]=\frac14$
 
 <details><summary>Answer</summary>
 
-**C** — $P(+)=0.99\cdot0.01+0.05\cdot0.99=0.0594$. $P(\text{ill}\mid+)=\frac{0.0099}{0.0594}=\frac16\approx0.167$.
+**A** — $\frac c3=1$; $\int_0^13x^3=\frac34$.
+
+</details>
+
+**Q22.** $\operatorname{Var}X=4$. $\operatorname{Var}(2X+3)=$
+A) $16$  B) $8$  C) $11$  D) $19$  E) $7$
+
+<details><summary>Answer</summary>
+
+**A** — $a^2\operatorname{Var}X$.
+
+</details>
+
+**Q23.** $X,Y$ independent, $\operatorname{Var}X=1$, $\operatorname{Var}Y=2$. $\operatorname{Var}(2X-3Y)=$
+A) $22$  B) $-14$  C) $14$  D) $8$  E) $-4$
+
+<details><summary>Answer</summary>
+
+**A** — $4+18$; variances add even for a difference.
+
+</details>
+
+**Q24.** Two fair dice. $E[\max]=$
+A) $\frac{91}{36}$  B) $\frac{161}{36}$  C) $\frac72$  D) $5$  E) $6$
+
+<details><summary>Answer</summary>
+
+**B** — $P(M=k)=\frac{2k-1}{36}$. ($\frac{91}{36}$ is $E[\min]$.)
+
+</details>
+
+**Q25.** $X\sim\text{Exponential}(\lambda=2)$. $P(X>1)=$
+A) $e^{-1/2}$  B) $1-e^{-2}$  C) $2e^{-2}$  D) $e^{-2}$  E) $\frac12$
+
+<details><summary>Answer</summary>
+
+**D** — $e^{-\lambda t}$.
+
+</details>
+
+**Q26.** $X,Y\sim U[0,1]$ independent. $P(\lvert X-Y\rvert<\frac12)=$
+A) $\frac12$  B) $\frac14$  C) $\frac34$  D) $\frac78$  E) $1$
+
+<details><summary>Answer</summary>
+
+**C** — Area of the square minus two corner triangles of area $\frac18$.
+
+</details>
+
+**Q27.** By Chebyshev, $P(\lvert X-\mu\rvert<2\sigma)$ is at least
+A) $\frac12$  B) $0.95$  C) $\frac14$  D) $\frac34$  E) $\frac89$
+
+<details><summary>Answer</summary>
+
+**D** — $1-\frac14$. ($0.95$ only for the normal distribution; $\frac89$ is $k=3$.)
+
+</details>
+
+**Q28.** The weak law of large numbers states that $\bar X_n\to\mu$
+A) almost surely  B) in probability  C) in distribution to $N(0,1)$  D) in $L^\infty$  E) monotonically
+
+<details><summary>Answer</summary>
+
+**B** — Strong = almost surely (A). C is the CLT (after standardizing).
+
+</details>
+
+**Q29.** Which implication between modes of convergence is always true?
+A) in distribution ⇒ almost surely  B) in probability ⇒ almost surely  C) almost surely ⇒ in probability  D) in distribution ⇒ in probability  E) in probability ⇒ in $L^1$
+
+<details><summary>Answer</summary>
+
+**C** — a.s. ⇒ in probability ⇒ in distribution; not backwards.
+
+</details>
+
+**Q30.** Population mean 1000, SD 100, sample size $n=25$. $P(\bar X<960)\approx$
+A) $0.3446$  B) $0.0228$  C) $0.1587$  D) $0.0013$  E) $0.4602$
+
+<details><summary>Answer</summary>
+
+**B** — SD of $\bar X$ is $20$, $z=-2$. ($0.3446$ forgets the $\sqrt n$: $z=-0.4$.)
 
 </details>

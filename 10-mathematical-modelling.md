@@ -1,334 +1,297 @@
 # 10. Mathematical Modelling
 
-> **Syllabus:**
-> - Dynamical systems
-> - Fokker–Planck formalism
-> - Synergetics
-> - Phase transitions
-> - Stability
-
-> **How to study this file:** Sections 1–7 are 🟢 core. They use only the ODE skills from file 05 (solve $y'=ky$, find equilibria, check $f'(x^*)$ or eigenvalues). Sections 8–11 are 🟡: learn only the facts in the "Must-know facts" boxes.
-> Time: about 1 study day for the 🟢 parts, plus 1–2 hours for the 🟡 parts and the MCQs.
-> Most MCQs here are: "find the equilibrium", "is it stable?", "what is the long-term value?", or "which word matches which idea?".
+> **Official topics (Placement Test guide):** dynamical systems; equilibria and their stability; linearization; exponential and logistic growth; predator-prey and epidemic models; units and dimensions of model parameters; bifurcations and phase transitions.
+>
+> **Exam:** 7 questions on this topic, 5 options each, about 85 seconds per question. Typical: find an equilibrium and decide stability, read a parameter's unit, recognize a bifurcation, know a model's long-term behaviour.
+>
+> **How to study this file:** every section is 🟢 (all are on the official list). The ODE skills come from [05-differential-equations.md](05-differential-equations.md). Time: about 1 study day + 1 hour for the MCQs.
+>
+> *Removed (not on the official list):* Fokker–Planck formalism, synergetics (slaving principle). The modelling cycle is reduced to a few lines.
 
 ## Contents
-1. [What is a mathematical model?](#1-what-is-a-mathematical-model-) 🟢
-2. [Exponential growth and decay](#2-exponential-growth-and-decay-) 🟢
-3. [Logistic growth](#3-logistic-growth-) 🟢
-4. [Equilibria and stability in 1D](#4-equilibria-and-stability-in-1d-) 🟢
-5. [Discrete models $x_{n+1}=F(x_n)$](#5-discrete-models-) 🟢
-6. [Two-species models and stability in 2D](#6-two-species-models-and-stability-in-2d-) 🟢
-7. [Epidemic model SIR](#7-epidemic-model-sir-) 🟢
-8. [Dimensional analysis and bifurcations](#8-dimensional-analysis-and-bifurcations-) 🟡
-9. [Fokker–Planck formalism](#9-fokkerplanck-formalism-) 🟡
-10. [Synergetics](#10-synergetics-) 🟡
-11. [Phase transitions](#11-phase-transitions-) 🟡
-12. [Formula sheet](#formula-sheet)
-13. [Practice MCQs](#practice-mcqs)
+1. [Dynamical systems](#1-dynamical-systems-) 🟢
+2. [Equilibria and their stability](#2-equilibria-and-their-stability-) 🟢
+3. [Linearization](#3-linearization-) 🟢
+4. [Exponential growth and decay](#4-exponential-growth-and-decay-) 🟢
+5. [Logistic growth](#5-logistic-growth-) 🟢
+6. [Predator–prey and competition models](#6-predatorprey-and-competition-models-) 🟢
+7. [Epidemic models](#7-epidemic-models-) 🟢
+8. [Units and dimensions of model parameters](#8-units-and-dimensions-of-model-parameters-) 🟢
+9. [Bifurcations](#9-bifurcations-) 🟢
+10. [Phase transitions](#10-phase-transitions-) 🟢
+11. [Formula sheet](#formula-sheet)
+12. [Practice MCQs](#practice-mcqs) (33 questions, 5 options)
 
 ---
 
-## 1. What is a mathematical model? 🟢
+## 1. Dynamical systems 🟢
 
-**Plain words:** a model describes a real situation with mathematics (variables, parameters, equations). Then we solve or simulate the model and compare the result with reality.
+A **dynamical system** is a rule that says how a state $x$ changes in time.
 
-**The modelling cycle**
-1. Real problem.
-2. Make **assumptions** and simplify.
-3. Build the mathematical model (choose variables, parameters, equations).
-4. Solve or simulate it.
-5. **Interpret** the result in the real world.
-6. **Validate**: compare with real data. If it does not fit, go back to step 2.
+| Type | Form | Example |
+|---|---|---|
+| continuous time (flow) | $\dot x=f(x)$, $x\in\mathbb R^n$ | $\dot N=rN(1-N/K)$ |
+| discrete time (map) | $x_{n+1}=F(x_n)$ | $x_{n+1}=rx_n(1-x_n)$ |
 
-**Types of models**
+**Words**
+- **State / phase space:** the set of all possible states $x$ (e.g. $\mathbb R^2$ for two populations).
+- **Autonomous:** $f$ does not depend on $t$.
+- **Orbit / trajectory:** the curve $t\mapsto x(t)$ of one solution. By uniqueness, orbits never cross.
+- **Phase portrait:** picture of many orbits plus equilibria and arrows.
+- **Equilibrium (fixed point):** $f(x^*)=0$ (flow) or $F(x^*)=x^*$ (map).
+- **Periodic orbit:** $x(t+T)=x(t)$; a **limit cycle** is an isolated periodic orbit that attracts or repels its neighbours (e.g. van der Pol oscillator).
+- **Attractor:** a set that nearby orbits approach (stable equilibrium, stable limit cycle, strange attractor).
 
-| Question | Choices |
+> **Must-know facts**
+> 1. **1D flows** ($\dot x=f(x)$): every solution is monotone; it goes to an equilibrium or to $\pm\infty$. No oscillations.
+> 2. **Poincaré–Bendixson:** a bounded orbit of a 2D autonomous flow approaches an equilibrium or a periodic orbit — **no chaos in 2D**.
+> 3. Chaos needs $\ge3$ dimensions for flows (Lorenz system), but already **1** dimension for maps (logistic map, $r\approx3.57$–$4$).
+> 4. **Chaos** = deterministic, bounded, and sensitive to initial conditions (positive Lyapunov exponent).
+
+**Model types:** deterministic vs stochastic (noise), continuous vs discrete time, linear vs nonlinear, ODE (no space) vs PDE (space + time). **Modelling cycle:** assumptions → model → solve → interpret → **validate** against data (verification = checking the model is solved correctly).
+
+---
+
+## 2. Equilibria and their stability 🟢
+
+### Definitions (official example 1)
+Let $x^*$ be an equilibrium.
+| Word | Meaning |
 |---|---|
-| How does time run? | **continuous** (ODE, PDE) or **discrete** (steps $n=0,1,2,\dots$; difference equations) |
-| Is there randomness? | **deterministic** (no chance) or **stochastic** (random, e.g. noise, Markov chains) |
-| Shape of the equations? | **linear** or **nonlinear** |
-| Space included? | ODE (no space) or PDE (space + time) |
+| **(Lyapunov) stable** | solutions that start close to $x^*$ **remain close** to $x^*$ for all later times (small perturbations stay small) |
+| **attracting** | solutions that start close converge to $x^*$ |
+| **asymptotically stable** | stable **and** attracting |
+| **unstable** | not stable: some solutions starting arbitrarily close move away |
 
-- **Variable** = a quantity that changes (population $N(t)$).
-- **Parameter** = a fixed number in the model (growth rate $r$).
+Formal: stable ⇔ for every $\varepsilon>0$ there is $\delta>0$ with $\lvert x(0)-x^*\rvert<\delta\Rightarrow\lvert x(t)-x^*\rvert<\varepsilon$ for all $t\ge0$.
 
-**Trap:** *validation* = compare the model with real data. *Verification* = check that the computer/maths solves the model correctly. Different things.
+### 1D test for $\dot x=f(x)$
+| $f'(x^*)$ | Result |
+|---|---|
+| $<0$ | asymptotically stable |
+| $>0$ | unstable |
+| $=0$ | no decision — look at the sign of $f$ around $x^*$ |
+
+**Graphical method:** where $f>0$ arrows point right, where $f<0$ left; arrows pointing **towards** $x^*$ = stable.
+
+**Example.** $\dot x=x^2-4$: $x^*=\pm2$, $f'=2x$: $-2$ stable, $+2$ unstable.
+**Example (test fails).** $\dot x=-x^3$: $f'(0)=0$, but $f>0$ for $x<0$ and $f<0$ for $x>0$ ⇒ asymptotically stable. $\dot x=x^3$: unstable. $\dot x=x^2$: **semi-stable** (attracts from the left, repels to the right).
+
+### Lyapunov functions (no linearization needed)
+If $V(x)$ has a strict minimum at $x^*$ and $\dot V=\nabla V\cdot f\le0$ nearby, then $x^*$ is stable; if $\dot V<0$ for $x\ne x^*$, asymptotically stable.
+Example: $\dot x=-x^3$, $V=x^2$: $\dot V=-2x^4<0$ ⇒ asymptotically stable.
+
+> **Trap:** stability is about **small** perturbations near $x^*$; it says nothing about noise, linearity or periodicity.
 
 ---
 
-## 2. Exponential growth and decay 🟢
+## 3. Linearization 🟢
 
-**Plain words:** the change is proportional to the current amount. Many people → many births.
+**Idea.** Near an equilibrium, replace $f$ by its first-order Taylor polynomial. With $u=x-x^*$:
+$$\dot u\approx Df(x^*)\,u\qquad(\text{1D: }\dot u\approx f'(x^*)\,u).$$
+$Df(x^*)$ is the **Jacobian matrix** at the equilibrium.
 
-**Model:** $N'(t)=rN(t)$, with start value $N(0)=N_0$.
-- $N(t)$ = amount at time $t$, $r$ = growth rate (a constant).
+### Recipe (2D, $\dot x=f(x,y)$, $\dot y=g(x,y)$)
+1. Solve $f=0$, $g=0$ → equilibria.
+2. $J=\begin{pmatrix}f_x&f_y\\g_x&g_y\end{pmatrix}$ at the equilibrium.
+3. $\tau=\operatorname{tr}J$, $\Delta=\det J$; eigenvalues from $\lambda^2-\tau\lambda+\Delta=0$.
+4. Classify:
 
-**Solution:** $N(t)=N_0e^{rt}$ (separable ODE, see file 05).
+| Condition | Type of the linearization |
+|---|---|
+| $\Delta<0$ | saddle (unstable) |
+| $\Delta>0$, $\tau<0$ | stable node ($\tau^2>4\Delta$) or stable spiral ($\tau^2<4\Delta$) |
+| $\Delta>0$, $\tau>0$ | unstable node / spiral |
+| $\Delta>0$, $\tau=0$ | center (linear) — **nonlinear system undecided** |
+| $\Delta=0$ | zero eigenvalue — undecided |
 
+**General rule:** all eigenvalues with $\operatorname{Re}\lambda<0$ ⇒ asymptotically stable; one with $\operatorname{Re}\lambda>0$ ⇒ unstable.
+
+### When can we trust the linearization?
+> 1. **Hartman–Grobman:** if the equilibrium is **hyperbolic** (no eigenvalue with $\operatorname{Re}\lambda=0$), the nonlinear system looks locally like its linearization (same stability and type of node/saddle/spiral).
+> 2. Non-hyperbolic ($\operatorname{Re}\lambda=0$, e.g. center, $f'(x^*)=0$): linearization does not decide; the nonlinear terms do (use a Lyapunov function, conserved quantity, or sign arguments).
+
+**Worked example.** $\dot x=\sin x$.
+1. Equilibria $x^*=k\pi$.
+2. $f'(x)=\cos x$: $f'(0)=1$ ⇒ unstable; $f'(\pi)=-1$ ⇒ stable.
+
+**Worked example (2D).** $\dot x=x-y$, $\dot y=x^2-4$ at $(2,2)$:
+1. $J=\begin{pmatrix}1&-1\\2x&0\end{pmatrix}=\begin{pmatrix}1&-1\\4&0\end{pmatrix}$.
+2. $\tau=1$, $\Delta=4>0$, $\tau^2-4\Delta<0$ ⇒ unstable spiral.
+
+### Discrete maps $x_{n+1}=F(x_n)$
+Linearization: $u_{n+1}\approx F'(x^*)u_n$.
+| Test | Result |
+|---|---|
+| $\lvert F'(x^*)\rvert<1$ | stable |
+| $\lvert F'(x^*)\rvert>1$ | unstable |
+| $F'(x^*)<0$ | values alternate around $x^*$ |
+In $n$ dimensions: all eigenvalues of $DF(x^*)$ with $\lvert\lambda\rvert<1$.
+
+**Example.** $x_{n+1}=0.5x_n+3$: $x^*=6$, $F'=0.5$ ⇒ stable. Logistic map $r=2.5$: $x^*=1-\frac1r=0.6$, $F'(0.6)=2.5(1-1.2)=-0.5$ ⇒ stable, alternating.
+
+> **Trap:** flows: sign of $\operatorname{Re}\lambda$; maps: size of $\lvert\lambda\rvert$. $F'(x^*)=-1.5$ is unstable for a map, but $f'(x^*)=-1.5$ is stable for a flow.
+
+---
+
+## 4. Exponential growth and decay 🟢
+
+$\dot N=rN$, $N(0)=N_0$ ⇒ $N(t)=N_0e^{rt}$.
 | Quantity | Formula |
 |---|---|
-| growth ($r>0$): doubling time | $T_2=\dfrac{\ln2}{r}$ |
-| decay ($r=-k<0$): half-life | $T_{1/2}=\dfrac{\ln2}{k}$ |
+| doubling time ($r>0$) | $T_2=\frac{\ln2}r$ |
+| half-life ($r=-k<0$) | $T_{1/2}=\frac{\ln2}k$ |
 
-**Example.** Bacteria: $N'=0.1N$, $N(0)=500$.
-- $N(t)=500e^{0.1t}$.
-- Doubling time $\ln2/0.1\approx6.93$ hours.
-- After $T_2$: $N=1000$ ✓.
+**Example.** $\dot N=0.1N$ (per hour): $T_2=6.93$ h.
+**Newton's law of cooling:** $\dot T=-k(T-T_{\text{env}})$ ⇒ $T=T_{\text{env}}+(T_0-T_{\text{env}})e^{-kt}$. Coffee $90°$, room $20°$, $k=0.1$: $T=20+70e^{-0.1t}$.
+**Discrete version:** $N_{n+1}=\lambda N_n$ ⇒ $N_n=\lambda^nN_0$; growth if $\lambda>1$.
 
-**Related model – Newton's law of cooling:** $T'=-k(T-T_{\text{env}})$.
-- $T$ = temperature of the object, $T_{\text{env}}$ = room temperature, $k>0$.
-- Solution: $T(t)=T_{\text{env}}+(T_0-T_{\text{env}})e^{-kt}$. For $t\to\infty$, $T\to T_{\text{env}}$.
-- Example: coffee $T_0=90$, room $20$, $k=0.1$: $T(t)=20+70e^{-0.1t}$.
-
-**Trap:** the exponential model grows forever. It is only realistic for small populations with unlimited resources. That is why we need the logistic model.
+> **Trap:** exponential growth never stops — realistic only for small populations with unlimited resources.
 
 ---
 
-## 3. Logistic growth 🟢
+## 5. Logistic growth 🟢
 
-**Plain words:** growth is fast when the population is small, and stops when it reaches the **carrying capacity** $K$ (the maximum the environment can support).
+$$\dot N=rN\left(1-\frac NK\right),\qquad N(t)=\frac{K}{1+\frac{K-N_0}{N_0}e^{-rt}}.$$
+$r$ = intrinsic growth rate, $K$ = carrying capacity.
 
-**Model (Verhulst):**
-$$N'=rN\Big(1-\frac NK\Big)$$
-- $r>0$ = growth rate for small $N$, $K>0$ = carrying capacity.
-
-**Solution:**
-$$N(t)=\frac{K}{1+\frac{K-N_0}{N_0}\,e^{-rt}}$$
-
-**Key facts**
+**Equilibria (official example 2).** $f(N)=rN(1-\frac NK)$, $f'(N)=r(1-\frac{2N}K)$.
+- $N=0$: $f'(0)=r>0$ ⇒ **unstable**.
+- $N=K$: $f'(K)=-r<0$ ⇒ **stable**.
 
 | Fact | Value |
 |---|---|
-| Equilibria | $N=0$ (unstable), $N=K$ (stable) |
-| Long-term value (if $N_0>0$) | $N(t)\to K$ |
-| Fastest growth | at $N=K/2$; the maximum rate is $rK/4$ |
-| Shape of $N(t)$ | S-shaped curve ("sigmoid"); inflection point at $N=K/2$ |
+| long-term ($N_0>0$) | $N\to K$ |
+| fastest growth | at $N=\frac K2$, rate $\frac{rK}4$ |
+| shape | S-curve (sigmoid), inflection at $\frac K2$ |
 
-**Example.** $N'=0.5N\big(1-\frac{N}{100}\big)$, $N(0)=10$.
-- $K=100$, $r=0.5$.
-- Solution: $N(t)=\dfrac{100}{1+9e^{-0.5t}}$ (since $\frac{100-10}{10}=9$).
-- Check $t=0$: $100/(1+9)=10$ ✓. For $t\to\infty$: $N\to100$.
-- Fastest growth at $N=50$, rate $=0.5\cdot100/4=12.5$.
+**Example.** $\dot N=0.5N(1-\frac N{100})$, $N_0=10$: $N=\frac{100}{1+9e^{-0.5t}}\to100$; fastest at $N=50$ with rate $12.5$.
 
-**Why $K/2$?** The growth rate is $f(N)=rN-\frac{r}{K}N^2$, a downward parabola. Its top is where $f'(N)=r-\frac{2r}{K}N=0$, i.e. $N=K/2$.
+**With harvesting:** $\dot N=rN(1-\frac NK)-h$. Equilibria exist only for $h\le\frac{rK}4$; at $h=\frac{rK}4$ they merge (saddle-node, section 9) — overharvesting causes collapse.
 
-**Trap:** the population **grows fastest** at $K/2$, not at $K$. At $K$ the growth is zero.
+> **Trap:** fastest growth is at $\frac K2$, not at $K$ (where growth is $0$).
 
 ---
 
-## 4. Equilibria and stability in 1D 🟢
+## 6. Predator–prey and competition models 🟢
 
-**Plain words:** an **equilibrium** is a state that does not change. It is **stable** if small pushes die out (the system comes back). It is **unstable** if small pushes grow.
+### Lotka–Volterra
+$$\dot x=\alpha x-\beta xy,\qquad\dot y=\delta xy-\gamma y\qquad(x\text{ prey},\ y\text{ predators}).$$
+- $\alpha$: prey growth, $\beta$: predation rate, $\delta$: predator gain from eating, $\gamma$: predator death rate.
+- Equilibria: $(0,0)$ — saddle ($J=\operatorname{diag}(\alpha,-\gamma)$); $\left(\frac\gamma\delta,\frac\alpha\beta\right)$ — linearization is a **center** ($\tau=0$, $\Delta=\alpha\gamma>0$).
+- The system has a **conserved quantity** $V=\delta x-\gamma\ln x+\beta y-\alpha\ln y$, so the nonlinear equilibrium really is a center: closed orbits, **periodic oscillations**, stable but not asymptotically stable.
+- Predator peaks lag behind prey peaks. Average populations over a cycle = the equilibrium values.
 
-**Model:** $x'=f(x)$ (the right side does not depend on $t$: "autonomous").
+**Example.** $\dot x=x(3-y)$, $\dot y=y(x-2)$: equilibrium $(2,3)$, $J=\begin{pmatrix}0&-2\\3&0\end{pmatrix}$, eigenvalues $\pm i\sqrt6$ → center.
 
-**Recipe**
-- Step 1: Solve $f(x^*)=0$. The solutions $x^*$ are the equilibria.
-- Step 2: Compute $f'(x)$.
-- Step 3: $f'(x^*)<0$ ⇒ **stable**. $f'(x^*)>0$ ⇒ **unstable**. $f'(x^*)=0$ ⇒ test fails, look at the sign of $f$.
+**Variant with logistic prey:** $\dot x=\alpha x(1-\frac xK)-\beta xy$: the inner equilibrium becomes a stable spiral — damped oscillations.
 
-**Graphical method:** draw $f(x)$. Where $f>0$, $x$ increases (arrow →). Where $f<0$, $x$ decreases (arrow ←). Arrows pointing **towards** a point = stable.
+### Competition
+$\dot x=x(1-x-ay)$, $\dot y=y(1-y-bx)$, $a,b>0$.
+- $a<1$, $b<1$ (weak competition): stable **coexistence**.
+- $a>1$, $b>1$: coexistence point is a saddle; one species wins depending on the start (bistability).
+- Otherwise: one species always wins (**competitive exclusion**).
 
-**Example 1.** $x'=x^2-4$.
-- Equilibria: $x^*=-2$ and $x^*=2$.
-- $f'(x)=2x$. $f'(-2)=-4<0$ → stable. $f'(2)=4>0$ → unstable.
+> **Trap:** the Lotka–Volterra inner equilibrium is a center, not a stable spiral: the populations keep cycling.
 
-**Example 2.** Logistic $N'=rN(1-N/K)$: $f'(N)=r-\frac{2rN}{K}$. $f'(0)=r>0$ unstable; $f'(K)=-r<0$ stable.
+---
 
-**Example 3 (test fails).** $x'=-x^3$: $f'(0)=0$. But $f>0$ for $x<0$ and $f<0$ for $x>0$, so all arrows point to $0$: stable.
+## 7. Epidemic models 🟢
 
-**Words for stability**
+### SIR
+$$\dot S=-\beta\frac{SI}N,\qquad\dot I=\beta\frac{SI}N-\gamma I,\qquad\dot R=\gamma I,\qquad S+I+R=N.$$
+$\beta$ = transmission rate, $\gamma$ = recovery rate, $\frac1\gamma$ = mean infectious period.
 
-| Word | Meaning |
+| Quantity | Formula |
 |---|---|
-| (Lyapunov) **stable** | start close ⇒ stay close |
-| **asymptotically stable** | stable **and** the solution goes back to $x^*$ |
-| **unstable** | some solutions starting close move away |
+| basic reproduction number | $R_0=\frac\beta\gamma$ (dimensionless) |
+| outbreak | $R_0>1$ (with $S\approx N$); dies out if $R_0<1$ |
+| peak of $I$ | when $S=\frac N{R_0}$ ($\dot I=0$) |
+| herd-immunity threshold | $1-\frac1{R_0}$ |
 
-**Fact:** in 1D ($x'=f(x)$) solutions are always monotone. There are no oscillations in 1D.
+**Example.** $\beta=0.3$/day, $\gamma=0.1$/day: $R_0=3$, sick for 10 days, herd immunity $67\%$.
+Table: $R_0=2\to50\%$, $2.5\to60\%$, $4\to75\%$, $5\to80\%$.
 
-**Trap:** for continuous models the test is the **sign** of $f'(x^*)$. Do not mix it with the discrete test $|F'(x^*)|<1$ (next section).
+**Why $R_0>1$?** $\dot I=I\gamma\left(R_0\frac SN-1\right)$; at the start $S\approx N$, so $I$ grows ⇔ $R_0>1$. (This is the linearization at the disease-free equilibrium.)
 
----
+### SIS (no immunity)
+$\dot I=\beta\frac{(N-I)I}N-\gamma I$ — a logistic equation. Equilibria $I=0$ and $I^*=N\left(1-\frac1{R_0}\right)$ (**endemic**). For $R_0>1$: $I^*$ stable, $0$ unstable; at $R_0=1$ they exchange stability (transcritical bifurcation).
 
-## 5. Discrete models $x_{n+1}=F(x_n)$ 🟢
-
-**Plain words:** time moves in steps (years, generations). The next value is computed from the current value.
-
-**Fixed point:** $x^*$ with $F(x^*)=x^*$. (Not $=0$!)
-
-**Recipe**
-- Step 1: Solve $F(x^*)=x^*$.
-- Step 2: Compute $F'(x^*)$.
-- Step 3: $|F'(x^*)|<1$ ⇒ **stable**. $|F'(x^*)|>1$ ⇒ **unstable**.
-- Extra: $F'(x^*)<0$ means the values jump from one side to the other (alternating approach).
-
-**Example 1 (linear map).** $x_{n+1}=0.5x_n+3$.
-- $x^*=0.5x^*+3$ ⇒ $x^*=6$.
-- $F'=0.5$, $|0.5|<1$ → stable. From $x_0=0$: $3,\ 4.5,\ 5.25,\dots\to6$.
-
-**Example 2 (logistic map).** $x_{n+1}=rx_n(1-x_n)$, $0\le x\le1$.
-- Fixed points: $x^*=0$ and $x^*=1-\frac1r$.
-- $F'(x)=r(1-2x)$, so $F'(0)=r$ and $F'(1-\frac1r)=2-r$.
-- With $r=2.5$: $x^*=1-0.4=0.6$, $F'(0.6)=-0.5$. $|{-0.5}|<1$ → stable, with alternating approach.
-
-**Logistic map facts (🟡, just remember)**
-
-| $r$ | Behaviour |
-|---|---|
-| $0<r<1$ | $x_n\to0$ |
-| $1<r<3$ | $x_n\to1-\frac1r$ |
-| $r=3$ | period doubling starts (2-cycle) |
-| $r\approx3.57$ | chaos begins |
-| $r=4$ | fully chaotic |
-
-- **Chaos** = deterministic, bounded, but very sensitive to the start value (positive Lyapunov exponent).
-- The continuous logistic ODE is never chaotic. The discrete logistic map can be chaotic.
-
-**Trap:** discrete stability is $|F'(x^*)|<1$, **not** $F'(x^*)<0$. Example: $F'(x^*)=-1.5$ is unstable for a map.
+> **Trap:** $R_0=\beta/\gamma$, not $\gamma/\beta$; herd immunity is $1-1/R_0$.
 
 ---
 
-## 6. Two-species models and stability in 2D 🟢
+## 8. Units and dimensions of model parameters 🟢
 
-**Plain words:** two populations $x(t)$, $y(t)$ influence each other. To check stability of an equilibrium we use the **Jacobian matrix** $J$ (all first partial derivatives) and its eigenvalues.
+**Rule 1:** every term in an equation has the **same unit**. **Rule 2:** arguments of $e^x$, $\ln x$, $\sin x$ are **dimensionless**.
 
-**Recipe (stability of a 2D equilibrium)**
-- Step 1: Solve $x'=0$ and $y'=0$ together → equilibria.
-- Step 2: Jacobian $J=\begin{pmatrix}\partial f/\partial x&\partial f/\partial y\\ \partial g/\partial x&\partial g/\partial y\end{pmatrix}$ for $x'=f(x,y)$, $y'=g(x,y)$.
-- Step 3: Put in the equilibrium. Compute $\tau=\operatorname{tr}J$ (sum of diagonal) and $\Delta=\det J$.
-- Step 4: Use the table.
-
-| Condition | Type |
-|---|---|
-| $\Delta<0$ | saddle (unstable) |
-| $\Delta>0$, $\tau<0$ | **stable** (node if $\tau^2>4\Delta$, spiral if $\tau^2<4\Delta$) |
-| $\Delta>0$, $\tau>0$ | unstable (node or spiral) |
-| $\Delta>0$, $\tau=0$ | center (closed orbits) in the linearization |
-
-**Same rule in eigenvalue words:** continuous system stable ⇔ all eigenvalues have **negative real part**. Discrete system stable ⇔ all eigenvalues have **absolute value $<1$**.
-
-### 6.1 Predator–prey (Lotka–Volterra)
-$$x'=\alpha x-\beta xy,\qquad y'=\delta xy-\gamma y$$
-- $x$ = prey (rabbits), $y$ = predators (foxes). All parameters $>0$.
-- $\alpha x$: prey grows without predators. $-\beta xy$: prey is eaten. $\delta xy$: predators grow by eating. $-\gamma y$: predators die without food.
-
-**Facts**
-- Equilibria: $(0,0)$ (saddle) and $\big(\frac\gamma\delta,\frac\alpha\beta\big)$.
-- The inner equilibrium is a **center**: populations **oscillate** in closed cycles. Stable, but not asymptotically stable.
-- The predator peak comes after the prey peak.
-
-**Example.** $x'=x(3-y)$, $y'=y(x-2)$.
-- Inner equilibrium: $3-y=0$ and $x-2=0$ ⇒ $(2,3)$.
-- $J=\begin{pmatrix}3-y&-x\\y&x-2\end{pmatrix}$. At $(2,3)$: $J=\begin{pmatrix}0&-2\\3&0\end{pmatrix}$.
-- $\tau=0$, $\Delta=0-(-6)=6>0$ → center, eigenvalues $\pm i\sqrt6$.
-
-### 6.2 Competition
-Two species compete for the same food: $x'=x(1-x-a y)$, $y'=y(1-y-b x)$ (with $a,b>0$).
-- If $a<1$ and $b<1$ (weak competition): both species **coexist** at a stable equilibrium.
-- If competition is strong: usually one species wins ("competitive exclusion").
-
-**Trap:** the inner equilibrium of Lotka–Volterra is a **center**, not a stable spiral. The populations never settle down; they keep cycling.
-
----
-
-## 7. Epidemic model SIR 🟢
-
-**Plain words:** the population is split into three groups:
-- $S$ = **susceptible** (can get sick), $I$ = **infected**, $R$ = **recovered** (immune).
-- $N=S+I+R$ = total population (constant).
-
-**Model**
-$$S'=-\beta\frac{SI}{N},\qquad I'=\beta\frac{SI}{N}-\gamma I,\qquad R'=\gamma I$$
-- $\beta$ = infection (contact) rate, $\gamma$ = recovery rate, $1/\gamma$ = average time a person is sick.
-
-**Key numbers**
-
-| Quantity | Formula | Meaning |
+**Reading units from a model** (time in days, populations in individuals = ind):
+| Model | Parameter | Unit |
 |---|---|---|
-| Basic reproduction number | $R_0=\dfrac{\beta}{\gamma}$ | number of new infections caused by one sick person in a fully susceptible population |
-| Epidemic? | $R_0>1$ (with $S\approx N$) | yes, $I$ grows at first; if $R_0<1$ it dies out |
-| Herd-immunity threshold | $p_c=1-\dfrac{1}{R_0}$ | fraction that must be immune to stop spread |
-| Peak of $I$ | when $S=\dfrac{N}{R_0}$ | then $I'=0$ |
+| $\dot N=rN$ | $r$ | $\frac1{\text{day}}$ (so $rt$ in $e^{rt}$ is dimensionless) |
+| logistic | $K$ | ind (same as $N$) |
+| Lotka–Volterra | $\alpha,\gamma$ | $\frac1{\text{day}}$ |
+| Lotka–Volterra | $\beta$ | $\frac1{\text{ind}\cdot\text{day}}$ (since $\beta xy$ must be ind/day) |
+| SIR with $\frac{SI}N$ | $\beta,\gamma$ | $\frac1{\text{day}}$ |
+| SIR | $R_0=\frac\beta\gamma$ | dimensionless |
+| cooling | $k$ | $\frac1{\text{time}}$ |
+| diffusion $u_t=Du_{xx}$ | $D$ | $\frac{\text{length}^2}{\text{time}}$ |
 
-**Example.** $\beta=0.3$ per day, $\gamma=0.1$ per day.
-- $R_0=0.3/0.1=3$. People are sick for $1/0.1=10$ days on average.
-- Herd immunity: $1-\frac13\approx67\%$.
-- The number of infected is largest when $S=N/3$.
+**Buckingham $\Pi$ theorem:** $n$ variables with $k$ independent base units (M, L, T, …) form $n-k$ independent dimensionless groups.
+Example: pendulum period $T$ from $L$, $m$, $g$: $n=4$, $k=3$ ⇒ one group $\frac{T^2g}L$ ⇒ $T\propto\sqrt{L/g}$ (mass drops out).
 
-**Quick table:** $R_0=2\to50\%$, $R_0=2.5\to60\%$, $R_0=4\to75\%$, $R_0=5\to80\%$.
+**Nondimensionalization** removes parameters:
+- Logistic: $u=\frac NK$, $s=rt$ ⇒ $\frac{du}{ds}=u(1-u)$ — no parameters left.
+- Lotka–Volterra: 4 parameters reduce to 1 ($\frac\gamma\alpha$).
+Characteristic time scale of $\dot N=rN$: $\frac1r$.
 
-**Why $I'=0$ at $S=N/R_0$:** $I'=I\big(\beta\frac SN-\gamma\big)=0$ ⇔ $\frac SN=\frac\gamma\beta=\frac1{R_0}$.
-
-**Trap:** $R_0=\beta/\gamma$, not $\gamma/\beta$. And herd immunity is $1-1/R_0$, not $1/R_0$.
-
----
-
-## 8. Dimensional analysis and bifurcations 🟡
-
-> **Must-know facts: dimensions**
-> - Every term in a correct equation has the **same unit**. Arguments of $e^x$, $\ln x$, $\sin x$ must have **no unit**.
-> - **Buckingham $\Pi$ theorem:** $n$ variables with $k$ independent basic units (e.g. mass M, length L, time T) can be combined into $n-k$ dimensionless groups.
-> - Example: pendulum period $T$ depends on length $L$, mass $m$, gravity $g$: $n=4$, $k=3$ → 1 group, so $T\propto\sqrt{L/g}$ (mass does not matter).
-> - **Nondimensionalization** (scaling variables) reduces the number of parameters. Logistic: with $u=N/K$, $s=rt$ you get $\frac{du}{ds}=u(1-u)$, no parameters left.
-
-> **Must-know facts: bifurcations**
-> - A **bifurcation** = at a critical parameter value the number or stability of equilibria changes.
-> - **Saddle-node:** $x'=r+x^2$. For $r<0$ two equilibria $\pm\sqrt{-r}$; at $r=0$ they meet; for $r>0$ none.
-> - **Transcritical:** $x'=rx-x^2$. Equilibria $0$ and $r$ exchange stability at $r=0$.
-> - **Pitchfork:** $x'=rx-x^3$. For $r<0$ only $0$ (stable); for $r>0$, $0$ is unstable and $\pm\sqrt r$ are stable (symmetry breaking).
-> - **Hopf:** a pair of complex eigenvalues crosses the imaginary axis → an oscillation (limit cycle) starts.
+> **Trap:** a rate multiplied by a product of two populations ($\beta xy$) needs units "per individual per time".
 
 ---
 
-## 9. Fokker–Planck formalism 🟡
+## 9. Bifurcations 🟢
 
-**Plain words:** a system with random noise. One random path is described by a **Langevin equation** / stochastic differential equation (SDE). The **Fokker–Planck equation** describes how the **probability density** $p(x,t)$ of all paths changes in time.
+A **bifurcation** occurs at a parameter value $r_c$ where the **number or stability** of equilibria (or periodic orbits) changes. At a bifurcation point of an equilibrium, the linearization has an eigenvalue with $\operatorname{Re}\lambda=0$ (non-hyperbolic).
+
+| Type | Normal form | What happens at $r=0$ |
+|---|---|---|
+| **saddle-node** (fold) | $\dot x=r+x^2$ | $r<0$: two equilibria $\pm\sqrt{-r}$ (one stable, one unstable); they collide and **vanish** for $r>0$ |
+| **transcritical** | $\dot x=rx-x^2$ | equilibria $0$ and $r$ **exchange stability** |
+| **pitchfork** (supercritical) | $\dot x=rx-x^3$ | $r<0$: only $0$, stable; $r>0$: $0$ unstable, $\pm\sqrt r$ stable (**symmetry breaking**) |
+| subcritical pitchfork | $\dot x=rx+x^3$ | unstable branches; jumps and **hysteresis** |
+| **Hopf** | complex pair $\alpha(r)\pm i\omega$ crosses $\operatorname{Re}\lambda=0$ | a **limit cycle** (oscillation) is born |
+| **period doubling** (maps) | $F'(x^*)$ crosses $-1$ | 2-cycle appears; logistic map at $r=3$ |
+
+**Worked example (pitchfork).** $\dot x=rx-x^3$, $r>0$.
+1. $x(r-x^2)=0$ ⇒ $x=0,\pm\sqrt r$.
+2. $f'(x)=r-3x^2$: $f'(0)=r>0$ unstable; $f'(\pm\sqrt r)=-2r<0$ stable.
+
+**Worked example (harvesting).** $\dot x=x(1-x)-h$.
+1. $x^2-x+h=0$ ⇒ $x=\frac{1\pm\sqrt{1-4h}}2$.
+2. Two equilibria for $h<\frac14$, one at $h=\frac14$, none for $h>\frac14$ ⇒ saddle-node at $h_c=\frac14$.
+
+**Logistic map** $x_{n+1}=rx_n(1-x_n)$: $0<r<1$: $x_n\to0$; $1<r<3$: $x_n\to1-\frac1r$ (transcritical at $r=1$); $r=3$: period doubling; $r\approx3.57$: chaos begins; $r=4$: fully chaotic.
+
+**Bifurcation diagram:** plot equilibria (solid = stable, dashed = unstable) against the parameter.
+
+> **Trap:** at a saddle-node the equilibria do not change stability — they disappear. At a transcritical bifurcation they swap stability.
+
+---
+
+## 10. Phase transitions 🟢
+
+A **phase transition** is a sudden change of the macroscopic state of a system when a control parameter (often temperature $T$) crosses a critical value $T_c$. In dynamical-systems language it corresponds to a bifurcation.
 
 > **Must-know facts**
-> - SDE: $dX=A(X)\,dt+\sigma\,dW$. Here $A$ = **drift** (the deterministic push), $\sigma$ = noise strength, $W$ = Wiener process.
-> - **Fokker–Planck equation:** $\displaystyle\frac{\partial p}{\partial t}=-\frac{\partial}{\partial x}\big[A(x)p\big]+\frac12\frac{\partial^2}{\partial x^2}\big[B(x)p\big]$ with **diffusion** coefficient $B=\sigma^2$. So: drift term + diffusion term.
-> - **Wiener process / Brownian motion** $W_t$: starts at $0$, independent increments, $W_t\sim\mathcal N(0,t)$ (mean $0$, variance $t$), continuous paths that are nowhere differentiable.
-> - Pure diffusion $\partial_tp=D\,\partial_x^2p$ starting at one point: $p$ is a Gaussian with variance $2Dt$ (it spreads and never stops).
-> - **Ornstein–Uhlenbeck** process $dX=-\gamma X\,dt+\sigma\,dW$: noise + pull back to $0$. Stationary distribution is Gaussian $\mathcal N\big(0,\frac{\sigma^2}{2\gamma}\big)$.
-> - For drift $A=-U'(x)$ (a potential $U$) the stationary density is $p_s\propto e^{-2U(x)/\sigma^2}$: most probable states are at the **minima** of $U$.
+> 1. **Order parameter** $m$: $0$ in the disordered phase, $\ne0$ in the ordered phase (magnetization, density difference, laser amplitude).
+> 2. **First-order** transition: $m$ **jumps**; latent heat, coexistence of phases, **hysteresis** (melting, boiling) — like a subcritical / saddle-node bifurcation.
+> 3. **Second-order (continuous)** transition: $m$ grows continuously from $0$ (ferromagnet at the Curie point) — like a **supercritical pitchfork**.
+> 4. **Landau theory:** $F(m)=a(T-T_c)m^2+bm^4$ ($a,b>0$). For $T>T_c$ the minimum is $m=0$; for $T<T_c$: $m=\pm\sqrt{\frac{a(T_c-T)}{2b}}\propto(T_c-T)^{1/2}$ (critical exponent $\frac12$).
+> 5. **Symmetry breaking:** the equations are symmetric ($m\to-m$), but the system picks one of $\pm m$.
+> 6. **Critical slowing down:** for $\dot x=ax-x^3$, the return rate to $0$ is $\lvert a\rvert$; as $a\to0$ the relaxation time $\frac1{\lvert a\rvert}\to\infty$. Fluctuations and the correlation length also grow near $T_c$.
+> 7. Ising model: no phase transition in 1D at $T>0$; there is one in 2D.
 
-**Mini example.** $dX=-2X\,dt+3\,dW$: drift $A(x)=-2x$, diffusion $B=3^2=9$.
-
-**Trap:** the diffusion coefficient is the **square** of the noise amplitude ($\sigma\,dW$ ⇒ $B=\sigma^2$).
-
----
-
-## 10. Synergetics 🟡
-
-**Plain words:** synergetics (Hermann Haken, 1970s) studies how many parts **work together** and produce order by themselves (self-organization). Examples: laser light, convection rolls in heated fluid, chemical oscillations.
-
-> **Must-know facts**
-> - Self-organization happens in **open** systems **far from equilibrium** (energy flows in and out).
-> - **Control parameter:** set from outside (pump power of a laser, heating of a fluid). When it crosses a critical value, the old state becomes **unstable**.
-> - **Order parameter:** a few **slow** variables that describe the new macroscopic order (e.g. laser light amplitude, roll amplitude).
-> - **Slaving principle:** the many **fast** variables follow ("are enslaved by") the few slow order parameters. Technically: *adiabatic elimination* — set the derivative of the fast variable to $0$.
-> - **Circular causality:** the parts create the order parameter, and the order parameter controls the parts.
-> - **Laser:** below the threshold pump power → normal lamp light (disordered); above → coherent laser light. This is like a second-order phase transition.
-
-**Mini example (adiabatic elimination).** $\dot u=\varepsilon u-us$, $\dot s=-\gamma s+u^2$, with $s$ fast ($\gamma$ large). Set $\dot s=0$: $s=u^2/\gamma$. Then $\dot u=\varepsilon u-u^3/\gamma$ (a pitchfork).
-
----
-
-## 11. Phase transitions 🟡
-
-**Plain words:** a **phase transition** is a sudden change of the macroscopic state when a parameter (often temperature $T$) crosses a critical value. Examples: water → ice, a magnet losing its magnetization when heated.
-
-> **Must-know facts**
-> - **Order parameter** $m$: $0$ in the disordered phase, $\ne0$ in the ordered phase (e.g. magnetization).
-> - **First-order** transition: the order parameter **jumps**; there is **latent heat**, coexistence of phases and hysteresis (example: boiling, melting).
-> - **Second-order (continuous)** transition: the order parameter changes **continuously** from $0$; fluctuations and correlation length become very large near $T_c$ (example: ferromagnet at the Curie temperature).
-> - **Landau theory:** free energy $F(m)=a(T-T_c)m^2+bm^4$. For $T<T_c$: $m=\pm\sqrt{\frac{a(T_c-T)}{2b}}$, so $m\propto(T_c-T)^{1/2}$ (mean-field exponent $\beta=\tfrac12$).
-> - **Symmetry breaking:** the equations are symmetric ($m\to-m$), but the system chooses one state ($+m$ or $-m$).
-> - **Critical slowing down:** near the critical point the system returns to equilibrium very slowly (relaxation time → ∞).
-> - Ising model: in 1D there is **no** phase transition at $T>0$; in 2D there is one.
-
-**Link to stability:** the pitchfork $x'=ax-x^3$ is the "dynamic version" of a second-order transition. For $a<0$ the state $0$ is stable; at $a=0$ it loses stability (relaxation time $1/|a|\to\infty$ = critical slowing down); for $a>0$ two new states $\pm\sqrt a$ appear.
+> **Trap:** "order parameter jumps" = first order; "continuous with $(T_c-T)^{1/2}$" = second order.
 
 ---
 
@@ -336,249 +299,320 @@ $$S'=-\beta\frac{SI}{N},\qquad I'=\beta\frac{SI}{N}-\gamma I,\qquad R'=\gamma I$
 
 | Topic | Formula / rule |
 |---|---|
-| Exponential | $N'=rN$ ⇒ $N=N_0e^{rt}$; doubling time $\ln2/r$ |
-| Cooling | $T'=-k(T-T_{\text{env}})$ ⇒ $T=T_{\text{env}}+(T_0-T_{\text{env}})e^{-kt}$ |
-| Logistic | $N'=rN(1-N/K)$; $N=\dfrac{K}{1+\frac{K-N_0}{N_0}e^{-rt}}$ |
-| Logistic facts | $0$ unstable, $K$ stable; fastest growth at $K/2$, rate $rK/4$ |
-| 1D continuous stability | $f(x^*)=0$; $f'(x^*)<0$ stable, $>0$ unstable |
-| 1D discrete stability | $F(x^*)=x^*$; $|F'(x^*)|<1$ stable, $>1$ unstable |
-| Logistic map | $x^*=1-1/r$, $F'(x^*)=2-r$, stable for $1<r<3$ |
-| 2D stability | $J$ at equilibrium; stable ⇔ $\operatorname{tr}J<0$ and $\det J>0$; $\det J<0$ saddle |
-| Eigenvalue rule | flow: all $\mathrm{Re}\,\lambda<0$; map: all $|\lambda|<1$ |
-| Lotka–Volterra | $x'=\alpha x-\beta xy$, $y'=\delta xy-\gamma y$; equilibrium $(\gamma/\delta,\ \alpha/\beta)$, center |
-| SIR | $R_0=\beta/\gamma$; epidemic iff $R_0>1$; herd immunity $1-1/R_0$; peak at $S=N/R_0$ |
+| Stability | stable: start close ⇒ stay close; asymptotically: + converge |
+| 1D flow | $f(x^*)=0$; $f'(x^*)<0$ stable, $>0$ unstable, $=0$ undecided |
+| 1D map | $F(x^*)=x^*$; $\lvert F'(x^*)\rvert<1$ stable |
+| Linearization | $\dot u=Df(x^*)u$; trust it if hyperbolic (Hartman–Grobman) |
+| 2D | $\Delta<0$ saddle; $\Delta>0,\tau<0$ stable; $\tau^2<4\Delta$ spiral; $\tau=0$ center (undecided) |
+| Exponential | $N_0e^{rt}$; $T_2=\ln2/r$ |
+| Cooling | $T_{\text{env}}+(T_0-T_{\text{env}})e^{-kt}$ |
+| Logistic | $0$ unstable, $K$ stable; fastest at $K/2$, rate $rK/4$ |
+| Lotka–Volterra | equilibrium $(\gamma/\delta,\alpha/\beta)$, center, periodic orbits |
+| SIR | $R_0=\beta/\gamma$; outbreak iff $R_0>1$; peak at $S=N/R_0$; herd immunity $1-1/R_0$ |
+| SIS | endemic $I^*=N(1-1/R_0)$ |
+| Units | all terms same unit; $[r]=1/\text{time}$; LV $[\beta]=1/(\text{ind}\cdot\text{time})$ |
 | Π theorem | $n-k$ dimensionless groups |
-| Bifurcations | saddle-node $r+x^2$; transcritical $rx-x^2$; pitchfork $rx-x^3$; Hopf: complex pair crosses $i\mathbb R$ |
-| Fokker–Planck | $p_t=-(Ap)_x+\frac12(Bp)_{xx}$; drift $A$, diffusion $B=\sigma^2$ |
-| Wiener | $W_t\sim\mathcal N(0,t)$ |
-| Synergetics | control parameter → instability → order parameter (slow); slaving of fast modes |
-| Phase transitions | 1st order: jump + latent heat; 2nd order: continuous; Landau $m\propto(T_c-T)^{1/2}$ |
+| Bifurcations | $r+x^2$ saddle-node; $rx-x^2$ transcritical; $rx-x^3$ pitchfork; Hopf: limit cycle |
+| Harvesting | $\dot x=rx(1-x/K)-h$: collapse at $h=rK/4$ |
+| Phase transitions | 1st: jump, latent heat; 2nd: continuous, $m\propto(T_c-T)^{1/2}$ |
 
 ---
 
 ## Practice MCQs
 
-**Q1.** A population follows $N'=0.1N$ (time in years). Its doubling time is about
-A) 0.69 years  B) 6.93 years  C) 10 years  D) 20 years
+**Q1.** (official example 1) Stability of an equilibrium means
+A) solutions diverge from the equilibrium  B) solutions remain close to the equilibrium under small perturbations  C) the system has no noise  D) the system is linear  E) the system is periodic
 
 <details><summary>Answer</summary>
 
-**B** — $T_2=\ln2/r=0.693/0.1\approx6.93$.
+**B** — Lyapunov stability.
 
 </details>
 
-**Q2.** The solution of $N'=2N$, $N(0)=5$ is
-A) $5e^{2t}$  B) $2e^{5t}$  C) $5+2t$  D) $10e^{t}$
+**Q2.** (official example 2) For $\dot x=rx\left(1-\frac xK\right)$ with $r,K>0$:
+A) the only equilibrium is $x=K$, stable  B) $x=0$ and $x=K$ are both stable  C) $x=0$ stable, $x=K$ unstable  D) $x=0$ unstable, $x=K$ stable  E) both unstable
 
 <details><summary>Answer</summary>
 
-**A** — $N=N_0e^{rt}$ with $N_0=5$, $r=2$. Check: $N'=10e^{2t}=2N$ ✓.
+**D** — $f'(0)=r>0$, $f'(K)=-r<0$.
 
 </details>
 
-**Q3.** For $N'=0.5N\big(1-\frac{N}{100}\big)$ with $N(0)=10$, what happens as $t\to\infty$?
-A) $N\to0$  B) $N\to50$  C) $N\to100$  D) $N\to\infty$
+**Q3.** An equilibrium is asymptotically stable if it is
+A) stable and nearby solutions converge to it  B) attracting only  C) unstable but bounded  D) a center  E) periodic
 
 <details><summary>Answer</summary>
 
-**C** — Logistic model with carrying capacity $K=100$. $K$ is the stable equilibrium, so $N\to100$ for every $N_0>0$.
+**A** — A center (D) is stable but not asymptotically stable.
 
 </details>
 
-**Q4.** In the logistic model $N'=rN(1-N/K)$, the population grows fastest when
-A) $N=K$  B) $N=0$  C) $N=K/4$  D) $N=K/2$
+**Q4.** The equilibria of $\dot x=x^2-4$ are
+A) $-2$ stable, $2$ unstable  B) $-2$ unstable, $2$ stable  C) both stable  D) both unstable  E) only $x=0$
 
 <details><summary>Answer</summary>
 
-**D** — $f(N)=rN-\frac rKN^2$ is a parabola with top at $f'(N)=r-\frac{2r}KN=0$, i.e. $N=K/2$.
+**A** — $f'=2x$.
 
 </details>
 
-**Q5.** The equilibria of $x'=x^2-4$ are
-A) $x=-2$ stable, $x=2$ unstable  B) $x=-2$ unstable, $x=2$ stable  C) both stable  D) both unstable
+**Q5.** For $\dot x=-x^3$, the equilibrium $x=0$ is
+A) unstable because $f'(0)=0$  B) asymptotically stable, although linearization gives $f'(0)=0$  C) a saddle  D) semi-stable  E) not an equilibrium
 
 <details><summary>Answer</summary>
 
-**A** — $x^2-4=0$ at $x=\pm2$. $f'(x)=2x$: $f'(-2)=-4<0$ stable, $f'(2)=4>0$ unstable.
+**B** — Linearization is inconclusive; the sign of $f$ (or $V=x^2$) shows stability.
 
 </details>
 
-**Q6.** The fixed point of $x_{n+1}=0.5x_n+3$ is
-A) $3$, unstable  B) $0$, stable  C) $6$, stable  D) $6$, unstable
+**Q6.** For $\dot x=\sin x$, the equilibrium $x=\pi$ is
+A) unstable  B) stable  C) semi-stable  D) not an equilibrium  E) a center
 
 <details><summary>Answer</summary>
 
-**C** — $x^*=0.5x^*+3$ ⇒ $0.5x^*=3$ ⇒ $x^*=6$. $|F'|=0.5<1$ ⇒ stable.
+**B** — $f'(\pi)=\cos\pi=-1<0$.
 
 </details>
 
-**Q7.** In the modelling cycle, "validation" means
-A) checking the computer code for errors  B) comparing model results with real data  C) choosing the variables  D) simplifying the problem
+**Q7.** The Hartman–Grobman theorem guarantees that the linearization decides stability when
+A) the system is 1D  B) no eigenvalue of the Jacobian has zero real part  C) all eigenvalues are real  D) the Jacobian is symmetric  E) the equilibrium is a center
 
 <details><summary>Answer</summary>
 
-**B** — Validation compares the model with reality. Checking that the model is solved correctly is called verification.
+**B** — Hyperbolic equilibrium.
 
 </details>
 
-**Q8.** In an SIR model, $\beta=0.3$ per day and $\gamma=0.1$ per day. Then $R_0$ equals
-A) $0.33$  B) $0.03$  C) $0.4$  D) $3$
+**Q8.** At an equilibrium $J=\begin{pmatrix}-1&2\\-2&-1\end{pmatrix}$. The equilibrium is
+A) a saddle  B) an unstable node  C) a center  D) a stable spiral  E) a stable node
 
 <details><summary>Answer</summary>
 
-**D** — $R_0=\beta/\gamma=0.3/0.1=3$. Since $R_0>1$, an epidemic starts.
+**D** — $\tau=-2$, $\Delta=5$, $\tau^2-4\Delta<0$: $-1\pm2i$.
 
 </details>
 
-**Q9.** A disease has $R_0=4$. The herd-immunity threshold is
-A) $25\%$  B) $50\%$  C) $75\%$  D) $80\%$
+**Q9.** The fixed point of $x_{n+1}=0.5x_n+3$ is
+A) $3$, unstable  B) $0$, stable  C) $6$, stable  D) $6$, unstable  E) $2$, stable
 
 <details><summary>Answer</summary>
 
-**C** — $1-1/R_0=1-0.25=0.75$.
+**C** — $x^*=6$, $\lvert F'\rvert=0.5<1$.
 
 </details>
 
-**Q10.** A model that contains random noise is called
-A) stochastic  B) deterministic  C) linear  D) discrete
+**Q10.** A map has $F'(x^*)=-1.5$, a flow has $f'(x^*)=-1.5$. Then
+A) both stable  B) map unstable, flow stable  C) both unstable  D) map stable, flow unstable  E) both undecided
 
 <details><summary>Answer</summary>
 
-**A** — Stochastic = includes chance. Deterministic = the same start always gives the same result.
+**B** — Map: $\lvert F'\rvert>1$. Flow: $f'<0$.
 
 </details>
 
-**Q11.** A cup of coffee cools by $T'=-0.1(T-20)$ with $T(0)=90$. Which formula gives $T(t)$?
-A) $90e^{-0.1t}$  B) $20+70e^{-0.1t}$  C) $20+90e^{-0.1t}$  D) $70+20e^{-0.1t}$
+**Q11.** For the logistic map $x_{n+1}=2.5x_n(1-x_n)$, the nonzero fixed point is
+A) $0.4$, unstable  B) $0.6$, unstable  C) $0.6$, stable  D) $0.4$, stable  E) $1$, stable
 
 <details><summary>Answer</summary>
 
-**B** — $T=T_{\text{env}}+(T_0-T_{\text{env}})e^{-kt}=20+70e^{-0.1t}$. Check: $T(0)=90$ ✓, $T\to20$ ✓.
+**C** — $1-\frac1{2.5}$, $F'=-0.5$.
 
 </details>
 
-**Q12.** For the logistic map $x_{n+1}=2.5\,x_n(1-x_n)$, the nonzero fixed point and its stability are
-A) $0.4$, unstable  B) $0.6$, unstable  C) $0.6$, stable  D) $0.4$, stable
+**Q12.** $\dot N=0.1N$ (time in years). Doubling time:
+A) $0.69$  B) $6.93$  C) $10$  D) $20$  E) $0.1$
 
 <details><summary>Answer</summary>
 
-**C** — $x^*=1-1/r=1-0.4=0.6$. $F'(x)=r(1-2x)$, $F'(0.6)=2.5\cdot(-0.2)=-0.5$. $|{-0.5}|<1$ → stable (alternating approach).
+**B** — $\ln2/0.1$.
 
 </details>
 
-**Q13.** The inner equilibrium of $x'=x(3-y)$, $y'=y(x-2)$ is
-A) $(3,2)$, a saddle  B) $(2,3)$, a center  C) $(2,3)$, a stable node  D) $(3,2)$, a center
+**Q13.** $\dot T=-0.1(T-20)$, $T(0)=90$. Then $T(t)=$
+A) $90e^{-0.1t}$  B) $20+70e^{-0.1t}$  C) $20+90e^{-0.1t}$  D) $70+20e^{-0.1t}$  E) $90-7t$
 
 <details><summary>Answer</summary>
 
-**B** — $3-y=0$, $x-2=0$ ⇒ $(2,3)$. $J=\begin{pmatrix}0&-2\\3&0\end{pmatrix}$: $\operatorname{tr}=0$, $\det=6>0$ → center (Lotka–Volterra cycles).
+**B** — $T_{\text{env}}+(T_0-T_{\text{env}})e^{-kt}$; check $T(0)=90$, $T\to20$.
 
 </details>
 
-**Q14.** The Jacobian at an equilibrium is $J=\begin{pmatrix}-1&2\\-2&-1\end{pmatrix}$. The equilibrium is
-A) a saddle  B) an unstable node  C) a center  D) a stable spiral
+**Q14.** $\dot N=0.5N(1-\frac N{100})$, $N(0)=10$. As $t\to\infty$:
+A) $N\to0$  B) $N\to50$  C) $N\to100$  D) $N\to\infty$  E) $N$ oscillates
 
 <details><summary>Answer</summary>
 
-**D** — $\tau=-2<0$, $\Delta=1+4=5>0$, $\tau^2-4\Delta=-16<0$ → complex eigenvalues $-1\pm2i$ with negative real part.
+**C** — 1D flows do not oscillate (E).
 
 </details>
 
-**Q15.** A fixed point of a **discrete** map has $F'(x^*)=-1.5$. A fixed point of a **continuous** model $x'=f(x)$ has $f'(x^*)=-1.5$. Which is true?
-A) both are stable  B) the map's point is unstable, the ODE's point is stable  C) both are unstable  D) the map's point is stable, the ODE's point is unstable
+**Q15.** In the logistic model, growth is fastest at
+A) $N=K$  B) $N=0$  C) $N=K/4$  D) $N=K/2$  E) $N=2K$
 
 <details><summary>Answer</summary>
 
-**B** — Map: $|-1.5|>1$ → unstable. ODE: $-1.5<0$ → stable.
+**D** — $f(N)=rN-\frac rKN^2$ peaks where $f'(N)=0$.
 
 </details>
 
-**Q16.** In an SIR model, the number of infected people $I$ is largest when
-A) $S=N/R_0$  B) $S=0$  C) $I=N/2$  D) $R=N/R_0$
+**Q16.** The coexistence equilibrium of $\dot x=\alpha x-\beta xy$, $\dot y=\delta xy-\gamma y$ is
+A) $(\alpha/\beta,\gamma/\delta)$, a saddle  B) $(\gamma/\delta,\alpha/\beta)$, a center with periodic orbits  C) $(\gamma/\delta,\alpha/\beta)$, a stable spiral  D) $(0,0)$  E) $(\beta/\alpha,\delta/\gamma)$
 
 <details><summary>Answer</summary>
 
-**A** — $I'=I\big(\beta\frac SN-\gamma\big)=0$ ⇔ $\frac SN=\frac\gamma\beta=\frac1{R_0}$.
+**B** — $\dot y=0\Rightarrow x=\gamma/\delta$; $\dot x=0\Rightarrow y=\alpha/\beta$.
 
 </details>
 
-**Q17.** A law involves 5 physical variables built from the 3 basic units M, L, T. How many dimensionless groups does the Buckingham $\Pi$ theorem give?
-A) 8  B) 5  C) 3  D) 2
+**Q17.** The inner equilibrium of $\dot x=x(3-y)$, $\dot y=y(x-2)$ is
+A) $(3,2)$, saddle  B) $(2,3)$, center  C) $(2,3)$, stable node  D) $(3,2)$, center  E) $(2,3)$, unstable spiral
 
 <details><summary>Answer</summary>
 
-**D** — $n-k=5-3=2$.
+**B** — $\tau=0$, $\Delta=6$.
 
 </details>
 
-**Q18.** For $x'=rx-x^3$ with $r>0$, the stable equilibria are
-A) $x=0$ only  B) $x=\pm\sqrt r$  C) $x=\pm r$  D) there are none
+**Q18.** SIR with $\beta=0.3$/day, $\gamma=0.1$/day. $R_0=$
+A) $0.33$  B) $0.03$  C) $0.4$  D) $3$  E) $30$
 
 <details><summary>Answer</summary>
 
-**B** — $x(r-x^2)=0$ ⇒ $x=0,\pm\sqrt r$. $f'(x)=r-3x^2$: $f'(0)=r>0$ unstable; $f'(\pm\sqrt r)=-2r<0$ stable. (Pitchfork bifurcation.)
+**D** — $\beta/\gamma=0.3/0.1$.
 
 </details>
 
-**Q19.** The Fokker–Planck equation describes
-A) the path of one single particle  B) the time evolution of a probability density  C) a discrete map  D) the equilibrium of a Lotka–Volterra model
+**Q19.** A disease has $R_0=4$. Herd-immunity threshold:
+A) $25\%$  B) $50\%$  C) $75\%$  D) $80\%$  E) $100\%$
 
 <details><summary>Answer</summary>
 
-**B** — It is a PDE for the density $p(x,t)$ with a drift term and a diffusion term. A single random path is described by a Langevin equation (SDE).
+**C** — $1-\frac14$.
 
 </details>
 
-**Q20.** For the SDE $dX=-2X\,dt+3\,dW$, the drift $A(x)$ and diffusion coefficient $B$ in the Fokker–Planck equation are
-A) $A=-2x$, $B=9$  B) $A=3$, $B=-2x$  C) $A=-2x$, $B=3$  D) $A=2x$, $B=9$
+**Q20.** In SIR, $I$ is largest when
+A) $S=N/R_0$  B) $S=0$  C) $I=N/2$  D) $R=N/R_0$  E) $S=N$
 
 <details><summary>Answer</summary>
 
-**A** — Drift = coefficient of $dt$: $-2x$. Diffusion = (noise amplitude)$^2=3^2=9$.
+**A** — $\dot I=0$.
 
 </details>
 
-**Q21.** For a standard Wiener process $W_t$, the variance of $W_4$ is
-A) $2$  B) $16$  C) $4$  D) $1$
+**Q21.** SIS model with $R_0>1$: the endemic equilibrium is
+A) $I^*=N/R_0$  B) $I^*=N(1-1/R_0)$  C) $I^*=0$  D) $I^*=N$  E) $I^*=R_0N$
 
 <details><summary>Answer</summary>
 
-**C** — $W_t\sim\mathcal N(0,t)$, so $\mathrm{Var}(W_4)=4$. (The standard deviation is $2$.)
+**B** — Like a logistic equation with capacity $N(1-1/R_0)$.
 
 </details>
 
-**Q22.** In synergetics, the slaving principle says that
-A) the order parameters are the fastest variables  B) the control parameter fixes the pattern in detail  C) the many fast variables follow the few slow order parameters  D) it works only in thermal equilibrium
+**Q22.** In $\dot N=rN$ with $t$ in days, the unit of $r$ is
+A) days  B) individuals per day  C) $1/\text{day}$  D) dimensionless  E) individuals
 
 <details><summary>Answer</summary>
 
-**C** — Fast, stable variables adapt to the slow order parameters. This reduces many variables to a few.
+**C** — $rN$ must have the unit of $\dot N$ (ind/day); also $rt$ in $e^{rt}$ must be dimensionless.
 
 </details>
 
-**Q23.** Which property belongs to a **first-order** phase transition?
-A) latent heat and a jump of the order parameter  B) the order parameter changes continuously  C) no hysteresis  D) $m\propto(T_c-T)^{1/2}$
+**Q23.** In $\dot x=\alpha x-\beta xy$ ($x,y$ in individuals, $t$ in days), $\beta$ has unit
+A) $1/\text{day}$  B) $1/(\text{individual}\cdot\text{day})$  C) individuals/day  D) dimensionless  E) day/individual
 
 <details><summary>Answer</summary>
 
-**A** — First order: jump, latent heat, coexistence, hysteresis. B and D describe a second-order (continuous) transition.
+**B** — $\beta xy$ must be ind/day.
 
 </details>
 
-**Q24.** "Critical slowing down" near a critical point means
-A) the order parameter jumps  B) fluctuations disappear  C) the system becomes chaotic  D) the time to return to equilibrium becomes very long
+**Q24.** The basic reproduction number $R_0=\beta/\gamma$ is
+A) measured in days  B) measured in $1/\text{day}$  C) dimensionless  D) measured in individuals  E) a probability
 
 <details><summary>Answer</summary>
 
-**D** — For $x'=ax-x^3$ near $x=0$ the return rate is $|a|$; as $a\to0$ the relaxation time $1/|a|\to\infty$.
+**C** — Ratio of two rates.
 
 </details>
 
-**Q25.** The equilibrium $x=0$ of the oscillator $x''+x=0$ (system $x'=y$, $y'=-x$) is
-A) asymptotically stable  B) unstable  C) stable but not asymptotically stable  D) a saddle
+**Q25.** 5 variables with 3 base units (M, L, T). Number of dimensionless groups:
+A) 8  B) 5  C) 3  D) 2  E) 15
 
 <details><summary>Answer</summary>
 
-**C** — $J=\begin{pmatrix}0&1\\-1&0\end{pmatrix}$, eigenvalues $\pm i$: a center. Solutions move on circles: they stay close but do not return to $0$.
+**D** — $n-k$.
+
+</details>
+
+**Q26.** With $u=N/K$ and $s=rt$, the logistic equation becomes
+A) $\frac{du}{ds}=ru(1-u)$  B) $\frac{du}{ds}=u(1-u)$  C) $\frac{du}{ds}=u(K-u)$  D) $\frac{du}{ds}=u$  E) $\frac{du}{ds}=Ku(1-u/K)$
+
+<details><summary>Answer</summary>
+
+**B** — All parameters scale out.
+
+</details>
+
+**Q27.** For $\dot x=rx-x^3$ with $r>0$, the stable equilibria are
+A) $0$ only  B) $\pm\sqrt r$  C) $\pm r$  D) none  E) $0$ and $\pm\sqrt r$
+
+<details><summary>Answer</summary>
+
+**B** — Supercritical pitchfork.
+
+</details>
+
+**Q28.** For $\dot x=r+x^2$, as $r$ increases through $0$:
+A) two equilibria collide and disappear  B) two equilibria exchange stability  C) a limit cycle is born  D) one equilibrium splits into three  E) nothing changes
+
+<details><summary>Answer</summary>
+
+**A** — Saddle-node. B is transcritical, C Hopf, D pitchfork.
+
+</details>
+
+**Q29.** A Hopf bifurcation occurs when
+A) a real eigenvalue crosses $0$  B) a pair of complex-conjugate eigenvalues crosses the imaginary axis, creating a limit cycle  C) the Jacobian is symmetric  D) two equilibria collide  E) the system becomes 1D
+
+<details><summary>Answer</summary>
+
+**B** — The real part of the eigenvalues changes sign while they stay complex.
+
+</details>
+
+**Q30.** $\dot x=x(1-x)-h$ (logistic growth with constant harvesting). Equilibria disappear for
+A) $h>1$  B) $h>\frac14$  C) $h>\frac12$  D) $h<0$  E) never
+
+<details><summary>Answer</summary>
+
+**B** — $x^2-x+h=0$ needs $1-4h\ge0$. Saddle-node at $h=\frac14=\frac{rK}4$.
+
+</details>
+
+**Q31.** Which property belongs to a first-order phase transition?
+A) latent heat and a jump of the order parameter  B) continuous order parameter  C) no hysteresis  D) $m\propto(T_c-T)^{1/2}$  E) no symmetry
+
+<details><summary>Answer</summary>
+
+**A** — B and D are second order.
+
+</details>
+
+**Q32.** "Critical slowing down" means
+A) the order parameter jumps  B) fluctuations disappear  C) the system becomes chaotic  D) the return time to equilibrium becomes very long near the critical point  E) the temperature drops
+
+<details><summary>Answer</summary>
+
+**D** — Relaxation time $1/\lvert a\rvert\to\infty$.
+
+</details>
+
+**Q33.** Which statement is true for autonomous ODE systems?
+A) chaos is possible in 1D  B) chaos is possible in 2D  C) chaos needs at least 3 dimensions  D) chaos is impossible in any dimension  E) chaos needs a linear system
+
+<details><summary>Answer</summary>
+
+**C** — Poincaré–Bendixson rules out chaos in 2D flows; 1D flows are monotone. (Maps can be chaotic already in 1D.)
 
 </details>
