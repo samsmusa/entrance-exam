@@ -1,0 +1,13 @@
+id,name,gender,method,study_hours,score_before,score_after,absences,passed
+1,Anna,F,Lecture,2,52,55,3,no
+2,Ben,M,Lecture,4,58,62,1,yes
+3,Clara,F,Lecture,3,50,57,2,no
+4,David,M,Lecture,1,45,48,4,no
+5,Emma,F,Video,5,60,68,1,yes
+6,Felix,M,Video,6,63,70,0,yes
+7,Greta,F,Video,4,55,64,2,yes
+8,Hans,M,Video,3,61,59,1,no
+9,Ida,F,Group,7,65,76,0,yes
+10,Jonas,M,Group,4,61,66,1,yes
+11,Lena,F,Group,6,62,73,0,yes
+12,Max,M,Group,12,70,94,0,yes

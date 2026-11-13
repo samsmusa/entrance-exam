@@ -144,9 +144,9 @@ An **estimator** $\hat\theta=T(X_1,\dots,X_n)$ is a function of the sample used 
 
 | Model | MLE |
 |---|---|
-| Bernoulli$(p)$ | $\hat p=\bar x$ |
-| Poisson$(\lambda)$ | $\hat\lambda=\bar x$ |
-| Exponential$(\lambda)$ | $\hat\lambda=\frac1{\bar x}$ |
+| Bernoulli $(p)$ | $\hat p=\bar x$ |
+| Poisson $(\lambda)$ | $\hat\lambda=\bar x$ |
+| Exponential $(\lambda)$ | $\hat\lambda=\frac1{\bar x}$ |
 | $N(\mu,\sigma^2)$ | $\hat\mu=\bar x$, $\hat\sigma^2=\frac1n\sum(x_i-\bar x)^2$ (biased!) |
 | $U[0,\theta]$ | $\hat\theta=\max x_i$ (biased: $E=\frac n{n+1}\theta$) |
 
