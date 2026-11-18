@@ -3,10 +3,12 @@
 > **Companion to [08-statistics.md](08-statistics.md).** This file uses one small dataset, [08-statistics-students.csv](08-statistics-students.csv), and works through every formula from the topic file by hand, step by step, so you can see what each one *means* on real numbers.
 >
 > All results were checked with `scipy`. Rounded values are given to 2–4 decimals.
+>
+> **Graphs:** every picture is drawn by a small Python script in [`scripts/08-statistics/`](scripts/08-statistics/) (one script per graph, shared style in [`common.py`](scripts/08-statistics/common.py)). See [Regenerating the graphs](#regenerating-the-graphs).
 
 ## Contents
 0. [The dataset](#0-the-dataset)
-1. [Descriptive statistics](#1-descriptive-statistics)
+1. [Descriptive statistics](#1-descriptive-statistics) — incl. **[1.3 Outliers, explained](#13-outliers-explained-quartiles-iqr-fences)**
 2. [Expectation, variance, higher moments](#2-expectation-variance-higher-moments)
 3. [Normal distribution and standardization](#3-normal-distribution-and-standardization)
 4. [Estimators and unbiasedness](#4-estimators-and-unbiasedness)
@@ -15,6 +17,7 @@
 7. [Parametric tests](#7-parametric-tests)
 8. [Non-parametric tests](#8-non-parametric-tests)
 9. [Summary: which question → which formula](#9-summary)
+10. [Regenerating the graphs](#regenerating-the-graphs)
 
 ---
 
@@ -68,6 +71,10 @@ For `study_hours` (sorted $1,2,3,3,4,4,4,5,6,6,7,12$): mean $\frac{57}{12}=4.75$
 
 **Meaning:** a typical student scored about 65–66 after the course. The mean (66) is a bit above the median (65) because of one very high score (Max, 94) → slight **right skew**.
 
+![Histogram of score_after with mean and median](images/08-statistics/04-histogram-skew.png)
+*Graph script: [`scripts/08-statistics/04_histogram_skew.py`](scripts/08-statistics/04_histogram_skew.py)*
+
+
 ### 1.2 Spread of `score_after`
 Deviations $x_i-\bar x$ (in id order) and squares:
 
@@ -86,20 +93,85 @@ Deviations $x_i-\bar x$ (in id order) and squares:
 | sample SD | $s=\sqrt{140.73}$ | **11.86** |
 | (dividing by $n$, for comparison) | $\frac{1548}{12}$ | 129 — smaller, biased |
 
-**Meaning:** scores are on average about 12 points away from the mean.
+**Meaning:** a *typical* distance of a score from the mean is about 12 points. (It is not exactly the plain average distance: that is $\frac{102}{12}=8.5$. The SD is larger because squaring gives big distances, like Max's 28, extra weight.)
 
-### 1.3 Quartiles, IQR, MAD, outliers
-Split the sorted data into halves of 6:
+**Why divide by $n-1=11$ and not $n=12$?** We measure distances from $\bar x$, which is computed from the same 12 scores and therefore sits as close to them as possible; distances to the unknown true mean $\mu$ would be a bit larger. So $\sum(x_i-\bar x)^2$ is slightly too small, and dividing by the smaller number $n-1$ corrects this **on average**. "Biased" means: over many repeated samples, the $\frac1n$ version averages $\frac{n-1}n\sigma^2$ (≈8% too low for $n=12$), while $s^2$ averages exactly $\sigma^2$ (simulation: section 4, graph 14). Extreme case: with $n=1$, dividing by $n$ always gives variance $0$, which is clearly wrong. Rule: **data is a sample → divide by $n-1$.**
 
-- `score_after`: lower half $48,55,57,59,62,64$ → $Q_1=\frac{57+59}2=58$; upper half $66,68,70,73,76,94$ → $Q_3=\frac{70+73}2=71.5$
-  - $IQR=71.5-58=13.5$
-  - Fences: $58-1.5\cdot13.5=37.75$ and $71.5+1.5\cdot13.5=91.75$
-  - **94 > 91.75 ⇒ Max's score is an outlier.**
-  - Five-number summary (boxplot): $48,\ 58,\ 65,\ 71.5,\ 94$
-  - MAD: $\lvert x_i-65\rvert$ sorted $=1,1,3,3,5,6,8,8,10,11,17,29$ → median $\frac{6+8}2=$ **7**
-- `study_hours`: $Q_1=\frac{3+3}2=3$, $Q_3=\frac{6+6}2=6$, $IQR=3$, fences $-1.5$ and $10.5$ → **12 hours is an outlier** (Max again).
+### 1.3 Outliers, explained (quartiles, IQR, fences)
 
-**Robustness demo.** Remove Max: mean of the other 11 scores $=\frac{698}{11}=63.45$ (drops by 2.5), median $=64$ (drops by only 1). The median is robust, the mean is not.
+**What is an outlier, in plain words?** A value that is *much further from the middle of the data than the rest of the data is*. "Much further" needs a ruler, and the ruler is the **IQR**: the width of the middle half of the students.
+
+**The idea in 4 steps**
+1. Find the **middle half** of the data: from $Q_1$ (25% of students are below) to $Q_3$ (75% are below). This is the **box**.
+2. Its width $IQR=Q_3-Q_1$ says how spread out a *normal* student is.
+3. Allow one and a half box-widths of extra room on each side. These limits are the **fences**:
+   $$\text{lower fence}=Q_1-1.5\cdot IQR,\qquad \text{upper fence}=Q_3+1.5\cdot IQR$$
+4. Anything **outside the fences** is flagged as an outlier.
+
+Why the median-based IQR and not the SD? Because the outlier itself would inflate the SD and partly hide itself. The quartiles barely react to one extreme value.
+
+**Step by step for `score_after`**
+| Step | Calculation | Result |
+|---|---|---|
+| sort | $48,55,57,59,62,64\ \mid\ 66,68,70,73,76,94$ | two halves of 6 |
+| $Q_1$ | median of lower half: $\frac{57+59}2$ | 58 |
+| $Q_3$ | median of upper half: $\frac{70+73}2$ | 71.5 |
+| IQR | $71.5-58$ | 13.5 |
+| allowed extra room | $1.5\cdot13.5$ | 20.25 |
+| lower fence | $58-20.25$ | 37.75 |
+| upper fence | $71.5+20.25$ | 91.75 |
+| check | $48\ge37.75$ ✓ … $76\le91.75$ ✓, **$94>91.75$ ✗** | **Max is an outlier** |
+
+So Max's 94 is outside the fence by $94-91.75=2.25$ points. Everybody else is comfortably inside (the next highest, Ida with 76, is 15.75 points below the fence).
+
+Same for `study_hours`: $Q_1=3$, $Q_3=6$, $IQR=3$, fences $3-4.5=-1.5$ and $6+4.5=10.5$ → **Max's 12 hours is also an outlier**; the next highest is 7.
+
+![Number line with box, fences and Max outside the upper fence](images/08-statistics/01-outliers-number-line.png)
+*Graph script: [`scripts/08-statistics/01_outliers_number_line.py`](scripts/08-statistics/01_outliers_number_line.py)*
+
+**The boxplot is just this picture compressed.** The box is $Q_1$–$Q_3$, the line inside is the median, the whiskers go to the **last data point still inside the fences** (here 48 and 76, *not* to the fences themselves), and anything beyond is drawn as a separate dot.
+
+![Labelled boxplot of score_after](images/08-statistics/02-boxplot-anatomy.png)
+*Graph script: [`scripts/08-statistics/02_boxplot_anatomy.py`](scripts/08-statistics/02_boxplot_anatomy.py)*
+
+**Five-number summary:** min $48$, $Q_1=58$, median $65$, $Q_3=71.5$, max $94$.
+
+**MAD** (another robust spread): $\lvert x_i-65\rvert$ sorted $=1,1,3,3,5,6,8,8,10,11,17,29$ → median $\frac{6+8}2=$ **7**.
+
+**Why do we care? What an outlier does to the statistics.** Remove Max and recompute:
+
+| statistic | with Max | without Max | change |
+|---|---|---|---|
+| mean | 66.00 | 63.45 | −2.55 |
+| median | 65 | 64 | −1 |
+| SD $s$ | 11.86 | 8.32 | −3.54 (−30%) |
+
+![Mean, median and SD with and without Max](images/08-statistics/03-outlier-effect.png)
+*Graph script: [`scripts/08-statistics/03_outlier_effect.py`](scripts/08-statistics/03_outlier_effect.py)*
+
+One student out of twelve changes the SD by 30%. The median is **robust**; the mean and especially the SD are not.
+
+**What "robust" means, shown with a typo.** Suppose Max's 94 were typed as **940**:
+
+| statistic | correct (94) | typo (940) | robust? |
+|---|---|---|---|
+| mean | 66 | 136.5 | no: above every real score |
+| SD $s$ | 11.86 | 253.16 | no: squares the huge distance |
+| median | 65 | 65 | yes: still the middle of the sorted list |
+| IQR | 13.5 | 13.5 | yes |
+| MAD | 7 | 7 | yes |
+
+Mean and SD use the **size** of every value; median, quartiles and MAD use only the **order**. The top value is still "the top one" whether it is 94 or 940, so order-based statistics don't move.
+
+**Second rule of thumb: z-scores.** $\lvert z\rvert>2$ (some books use 3) means "unusual". Max has $z=2.36$, nobody else exceeds $\lvert z\rvert=1.52$ (see the z-score graph in section 3.1). Both rules point at the same student.
+
+**An outlier is not automatically a mistake.** Before deleting one, ask *why* it is extreme:
+- **Data error** (typo 94 instead of 49, wrong unit) → fix or remove.
+- **Genuine extreme case** → keep it, but report robust statistics (median, IQR) or use rank-based (non-parametric) tests.
+
+Max is the second kind: he studied 12 h/week, far more than anyone else, and his score fits that (see the scatter plot in 1.5). He is a real, hard-working student, not a typo.
+
+> **Exam shortcut:** compute $Q_1,Q_3$ → IQR → fences $Q_1-1.5\,IQR$ and $Q_3+1.5\,IQR$ → anything outside is an outlier. Example: $Q_1=20,Q_3=30$ ⇒ fences $5$ and $45$.
 
 ### 1.4 Linear change
 Teacher converts scores to a 0–20 scale: $y=\frac{x}{5}$ ($a=0.2$, $b=0$).
@@ -123,12 +195,31 @@ $$r=\frac{370}{\sqrt{90.25\cdot1548}}=\frac{370}{373.77}=\mathbf{0.990}$$
 $$\hat y=46.53+4.10\,x$$
 Each extra hour of study per week ≈ +4.1 points. Prediction for 8 hours: $46.53+32.8=79.3$. The line passes through $(\bar x,\bar y)=(4.75,66)$.
 
+![Scatter plot of hours vs score with regression lines with and without Max](images/08-statistics/06-scatter-regression.png)
+*Graph script: [`scripts/08-statistics/06_scatter_regression.py`](scripts/08-statistics/06_scatter_regression.py)*
+
+**Outlier in two dimensions.** Max is extreme on *each* axis, yet he lies close to the trend, so $r$ barely changes ($0.990$ with him, $0.984$ without). He is a **high-leverage point**: because he is far to the right, he still tilts the line (slope $4.51\to4.10$). An outlier that sat far *off* the line (e.g. 12 h but score 50) would wreck $r$ — always plot the data before trusting a correlation.
+
+
 ---
 
 ## 2. Expectation, variance, higher moments
 
 ### 2.1 A discrete distribution from `absences`
-Treat "absences of a randomly picked student" as a random variable $X$:
+Treat "absences of a randomly picked student" as a random variable $X$.
+
+**Step 1 — tally the `absences` column** (how many students have exactly $k$ absences):
+
+| $k$ | students with exactly $k$ absences | count |
+|---|---|---|
+| 0 | Felix, Ida, Lena, Max | 4 |
+| 1 | Ben, Emma, Hans, Jonas | 4 |
+| 2 | Clara, Greta | 2 |
+| 3 | Anna | 1 |
+| 4 | David | 1 |
+| | total | 12 |
+
+**Step 2 — divide by $n=12$** to get probabilities (picking one student at random, each is equally likely), then multiply:
 
 | $k$ | 0 | 1 | 2 | 3 | 4 |
 |---|---|---|---|---|---|
@@ -137,11 +228,17 @@ Treat "absences of a randomly picked student" as a random variable $X$:
 | $k\,P$ | 0 | 4/12 | 4/12 | 3/12 | 4/12 |
 | $k^2P$ | 0 | 4/12 | 8/12 | 9/12 | 16/12 |
 
+**What the helper rows mean:** $kP$ = value × its probability; summing the row gives the weighted average $E[X]=\sum k\,P(X=k)$. $k^2P$ = squared value × its probability; summing gives $E[X^2]=\sum k^2P(X=k)$, needed for the variance. (Check: $\frac{15}{12}$ is exactly the total of all absences $3+1+2+4+1+0+2+1+0+1+0+0=15$ divided by 12 students.)
+
 - $E[X]=\frac{15}{12}=\mathbf{1.25}$ absences
 - $E[X^2]=\frac{37}{12}=3.083$
 - $\operatorname{Var}X=E[X^2]-(E[X])^2=3.083-1.5625=\mathbf{1.521}$, $\sigma=1.233$
 
 **Trap check:** $E[X^2]=3.083\ne(E[X])^2=1.5625$; the difference is exactly the variance.
+
+![Bar chart of the absences distribution with E[X]](images/08-statistics/07-absences-distribution.png)
+*Graph script: [`scripts/08-statistics/07_absences_pmf.py`](scripts/08-statistics/07_absences_pmf.py)*
+
 
 ### 2.2 Skewness and kurtosis of `score_after`
 Use the population-style moments ($\sigma^2=\frac{1548}{12}=129$, $\sigma=11.358$).
@@ -171,16 +268,56 @@ Same for `study_hours`: skewness $1.26$ (clearly right-skewed, the 12-hour outli
 
 **Meaning:** Max is 2.36 SDs above average — unusual. Jonas is exactly average. Z-scores have mean 0 and SD 1 and have no units, so they let you compare different scales (e.g. Max's hours $z=2.53$ is even more extreme than his score).
 
-### 3.2 Probabilities with a normal model
+![z-score of each student](images/08-statistics/05-zscores.png)
+*Graph script: [`scripts/08-statistics/05_zscores.py`](scripts/08-statistics/05_zscores.py)*
+
+
+### 3.2 Probabilities with a normal model (what Φ means)
 Suppose from previous years: after-scores $\sim N(66,\,12^2)$, i.e. $\mu=66$, $\sigma=12$ (careful: written $N(66,144)$ the second number is the **variance**).
 
-- $P(\text{score}>90)=1-\Phi\!\left(\frac{90-66}{12}\right)=1-\Phi(2)=1-0.9772=\mathbf{0.0228}$ (about 2%)
-- $P(54<\text{score}<78)=\Phi(1)-\Phi(-1)=2\Phi(1)-1=\mathbf{0.6826}$ (the "68%" of the 68–95–99.7 rule)
-- $P(\text{score}<60)=\Phi(-0.5)=1-0.6915=\mathbf{0.3085}$ → ≈31% expected to fail
-- 95% of students between $66\pm1.96\cdot12=[42.5,\ 89.5]$
+**Question:** what fraction of students score at most 78? In symbols $P(X\le78)$, and the formula says
+$$P(X\le x)=\Phi\!\left(\frac{x-\mu}{\sigma}\right).$$
+
+**Read it from the inside out:**
+
+1. **$\frac{x-\mu}{\sigma}$ converts the score to a z-value**, i.e. "how many SDs above the mean": $\frac{78-66}{12}=\frac{12}{12}=1$. So 78 is exactly **1 SD above** average.
+2. **$\Phi(z)$ is the area under the standard bell curve $N(0,1)$ to the left of $z$**, meaning the share of the population below $z$. You look it up in the table: $\Phi(1)=0.8413$.
+3. **Result:** $P(X\le78)=\Phi(1)=0.8413$, so 84% of students score 78 or less.
+
+**Why can one table work for every normal distribution?** Standardizing only re-labels the x-axis (66→0, 78→1, 90→2, …). The shape is the same, so **the shaded area is the same**: compare panels (a) and (b) below. That's why tables list only $N(0,1)$.
+
+![What Phi means: same area on the real and standard scale, symmetry, and the cumulative curve](images/08-statistics/15-phi-standardization.png)
+*Graph script: [`scripts/08-statistics/15_phi_standardization.py`](scripts/08-statistics/15_phi_standardization.py)*
+
+**Facts about Φ** (see panels c and d):
+- $\Phi(z)$ is a probability, so $0\le\Phi(z)\le1$; it increases with $z$.
+- $\Phi(0)=0.5$: half the bell is left of the centre.
+- **Symmetry:** $\Phi(-z)=1-\Phi(z)$. The left tail below $-z$ equals the right tail above $+z$. Tables list only $z\ge0$, so you use this for negative $z$.
+- $\Phi$ is the **CDF** (cumulative distribution function) of $N(0,1)$; panel (d) is the curve, the table is the same curve written as numbers.
+
+**The three cases on our scores** (always standardize first):
+
+| Question | Standardize | Formula | Result |
+|---|---|---|---|
+| $P(\text{score}\le78)$, left area | $z=\frac{78-66}{12}=1$ | $\Phi(1)$ | **0.8413** |
+| $P(\text{score}>90)$, right area | $z=\frac{90-66}{12}=2$ | $1-\Phi(2)=1-0.9772$ | **0.0228** (≈2%) |
+| $P(54<\text{score}<78)$, middle area | $z_1=\frac{54-66}{12}=-1$, $z_2=1$ | $\Phi(1)-\Phi(-1)=\Phi(1)-(1-\Phi(1))=2\Phi(1)-1$ | **0.6826** (the "68%" rule) |
+| $P(\text{score}<60)$, negative $z$ | $z=\frac{60-66}{12}=-0.5$ | $\Phi(-0.5)=1-\Phi(0.5)=1-0.6915$ | **0.3085** → ≈31% expected to fail |
+
+**Going backwards (from area to score):** "Which score do the top 2.5% beat?" We need $\Phi(z)=0.975$. The table gives $z=1.96$, so $x=\mu+z\sigma=66+1.96\cdot12=89.5$. Similarly 95% of students lie in $66\pm1.96\cdot12=[42.5,\ 89.5]$.
+
+> **Exam recipe:** (1) draw the bell, shade what is asked; (2) $z=\frac{x-\mu}\sigma$; (3) left area → $\Phi(z)$, right area → $1-\Phi(z)$, middle → $\Phi(z_2)-\Phi(z_1)$; (4) negative $z$ → $1-\Phi(\lvert z\rvert)$.
+
+![Normal curve N(66,12^2) with shaded probabilities](images/08-statistics/08-normal-curve.png)
+*Graph script: [`scripts/08-statistics/08_normal_curve.py`](scripts/08-statistics/08_normal_curve.py)*
+
 
 ### 3.3 Is `score_after` normal? (Q–Q idea / KS test)
 Compare the empirical CDF $F_n$ with the fitted $N(66,11.86^2)$ CDF. The largest gap is at $x=70$: $F_n(70)=\frac9{12}=0.75$ vs $F_0(70)=\Phi\!\left(\frac{4}{11.86}\right)=\Phi(0.337)=0.632$, so $D=0.118$. Approximate 5% critical value $\frac{1.36}{\sqrt{12}}=0.39$ → **no evidence against normality** (Shapiro–Wilk $p=0.59$ agrees). With $n=12$ such tests have little power, so "not rejected" ≠ "proven normal".
+
+![Empirical CDF vs normal CDF](images/08-statistics/13-ecdf-ks.png)
+*Graph script: [`scripts/08-statistics/13_ecdf_ks.py`](scripts/08-statistics/13_ecdf_ks.py)*
+
 
 ---
 
@@ -195,6 +332,12 @@ Compare the empirical CDF $F_n$ with the fitted $N(66,11.86^2)$ CDF. The largest
 | SE of $\bar X$ | $\frac s{\sqrt n}=\frac{11.86}{\sqrt{12}}$ | 3.42 |
 
 **Bias of the $1/n$ version:** $E\left[\frac1n\sum\right]=\frac{n-1}n\sigma^2=\frac{11}{12}\sigma^2$; here $129=\frac{11}{12}\cdot140.73$ exactly. Bessel's correction ($n-1$) removes this.
+
+Simulation: draw 20 000 classes of 12 students from $N(66,12^2)$ (true $\sigma^2=144$) and estimate the variance each time:
+
+![Simulated distributions of the two variance estimators](images/08-statistics/14-estimator-bias.png)
+*Graph script: [`scripts/08-statistics/14_estimator_bias.py`](scripts/08-statistics/14_estimator_bias.py)*
+
 
 **Standard error meaning:** if we repeated the study with new 12 students, $\bar x$ would typically move by about 3.4 points. With 48 students (4×) the SE would halve to ≈1.7.
 
@@ -245,6 +388,9 @@ Not symmetric around $s^2$ (the $\chi^2$ distribution is skewed).
 - **Sample size** for margin $E=5$ with $\sigma=12$ at 95%: $n=\left(\frac{1.96\cdot12}{5}\right)^2=22.1$ ⇒ **23 students** (round up).
 - To halve the margin (6.79 → 3.39) we need $4\cdot12=48$ students.
 
+![Confidence intervals of different levels and 40 simulated intervals](images/08-statistics/09-confidence-intervals.png)
+*Graph script: [`scripts/08-statistics/09_confidence_intervals.py`](scripts/08-statistics/09_confidence_intervals.py)*
+
 **Interpretation of [58.46, 73.54]:** if we repeated this study many times, 95% of intervals built this way would contain the true mean score μ. It does **not** say 95% of students score in this range (individual scores range 48–94).
 
 ---
@@ -258,6 +404,10 @@ Not symmetric around $s^2$ (the $\chi^2$ distribution is skewed).
 3. Test statistic (σ = 12 known): $z=\frac{66-60}{12/\sqrt{12}}=\frac6{3.464}=\mathbf{1.73}$
 4. Critical value $1.96$; $\lvert z\rvert=1.73<1.96$. p-value $=2(1-\Phi(1.73))=2(1-0.9584)=\mathbf{0.083}$
 5. $p=0.083>0.05$ ⇒ **do not reject $H_0$**.
+
+![Standard normal curve with rejection region and p-value area](images/08-statistics/10-hypothesis-test.png)
+*Graph script: [`scripts/08-statistics/10_hypothesis_test.py`](scripts/08-statistics/10_hypothesis_test.py)*
+
 
 **Meaning of $p=0.083$:** *if* the true mean were 60, a sample mean at least 6 points away would happen about 8.3% of the time. That is not rare enough at the 5% level. It is **not** "the probability that $H_0$ is true".
 
@@ -294,6 +444,10 @@ $\bar d=\frac{90}{12}=7.5$, $s_d=6.39$, $SE=\frac{6.39}{\sqrt{12}}=1.844$
 $H_0:\mu_d=0$. $t=\frac{7.5}{1.844}=\mathbf{4.07}$, df 11, critical $2.201$, $p=0.0019$ ⇒ **reject $H_0$**: scores improved significantly (on average +7.5 points).
 Why paired? The same students are measured twice; pairing removes the student-to-student differences.
 
+![Before/after slope chart and differences per student](images/08-statistics/11-paired-before-after.png)
+*Graph script: [`scripts/08-statistics/11_paired_before_after.py`](scripts/08-statistics/11_paired_before_after.py)*
+
+
 ### 7.3 Two-sample $t$-test — do girls and boys differ? (`gender`)
 | | scores | $n$ | mean | $s^2$ |
 |---|---|---|---|---|
@@ -318,6 +472,10 @@ $F=\frac{s_M^2}{s_F^2}=\frac{237.5}{71.5}=\mathbf{3.32}$, df $(5,5)$, critical $
 - $F=\frac{474.75}{66.5}=\mathbf{7.14}$, critical $F_{2,9,0.95}=4.26$, $p=0.014$ ⇒ **reject**: at least one method has a different mean (Group looks best).
 
 Check: $SSB+SSW=949.5+598.5=1548=$ total SS from section 1.2.
+
+![Scores by method and by gender with group means](images/08-statistics/12-groups.png)
+*Graph script: [`scripts/08-statistics/12_groups.py`](scripts/08-statistics/12_groups.py)*
+
 
 ### 7.6 $\chi^2$ variance test
 $H_0:\sigma^2=144$ ($\sigma=12$). $\chi^2=\frac{(n-1)s^2}{\sigma_0^2}=\frac{1548}{144}=\mathbf{10.75}$, df 11; acceptance region $[3.82,\ 21.92]$ ⇒ do not reject — consistent with the variance CI $[70.6,405.7]$ containing 144.
@@ -413,3 +571,37 @@ print(stats.ttest_rel(df.score_after, df.score_before))
 print(stats.f_oneway(*[g.score_after for _, g in df.groupby("method")]))
 print(stats.kruskal(*[g.score_after for _, g in df.groupby("method")]))
 ```
+
+---
+
+## Regenerating the graphs
+
+All graphs are produced by the scripts in [`scripts/08-statistics/`](scripts/08-statistics/) from [`08-statistics-students.csv`](08-statistics-students.csv) and saved to [`images/08-statistics/`](images/08-statistics/). Change the CSV, rerun, and every picture updates.
+
+```bash
+# all graphs at once (from the repo root)
+uv run --no-project --with matplotlib --with numpy --with scipy \
+    python scripts/08-statistics/make_all.py
+
+# or a single one
+uv run --no-project --with matplotlib --with numpy --with scipy \
+    python scripts/08-statistics/01_outliers_number_line.py
+```
+
+| Graph | Topic | Script |
+|---|---|---|
+| 01 outliers on a number line | IQR, fences, outliers | [`01_outliers_number_line.py`](scripts/08-statistics/01_outliers_number_line.py) |
+| 02 boxplot anatomy | five-number summary | [`02_boxplot_anatomy.py`](scripts/08-statistics/02_boxplot_anatomy.py) |
+| 03 effect of one outlier | robustness of mean / median / SD | [`03_outlier_effect.py`](scripts/08-statistics/03_outlier_effect.py) |
+| 04 histogram | shape, skewness | [`04_histogram_skew.py`](scripts/08-statistics/04_histogram_skew.py) |
+| 05 z-scores | standardization | [`05_zscores.py`](scripts/08-statistics/05_zscores.py) |
+| 06 scatter + regression | correlation, least squares, leverage | [`06_scatter_regression.py`](scripts/08-statistics/06_scatter_regression.py) |
+| 07 absences distribution | $E[X]$, $\operatorname{Var}X$ | [`07_absences_pmf.py`](scripts/08-statistics/07_absences_pmf.py) |
+| 08 normal curve | $\Phi$, probabilities | [`08_normal_curve.py`](scripts/08-statistics/08_normal_curve.py) |
+| 09 confidence intervals | CI width, meaning of 95% | [`09_confidence_intervals.py`](scripts/08-statistics/09_confidence_intervals.py) |
+| 10 hypothesis test | rejection region, p-value | [`10_hypothesis_test.py`](scripts/08-statistics/10_hypothesis_test.py) |
+| 11 before / after | paired $t$, sign, Wilcoxon | [`11_paired_before_after.py`](scripts/08-statistics/11_paired_before_after.py) |
+| 12 groups | ANOVA, Kruskal–Wallis, $t$, Mann–Whitney | [`12_groups.py`](scripts/08-statistics/12_groups.py) |
+| 13 ECDF vs normal | Kolmogorov–Smirnov | [`13_ecdf_ks.py`](scripts/08-statistics/13_ecdf_ks.py) |
+| 14 estimator bias | why $n-1$ | [`14_estimator_bias.py`](scripts/08-statistics/14_estimator_bias.py) |
+| 15 what Φ means | standardization, $\Phi$, symmetry, CDF | [`15_phi_standardization.py`](scripts/08-statistics/15_phi_standardization.py) |

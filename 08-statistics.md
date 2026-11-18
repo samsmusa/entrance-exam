@@ -33,6 +33,8 @@
 | median | middle of the sorted data (even $n$: average of the two middle values) | yes |
 | mode | most frequent value | — |
 
+**Robust to outliers** = one extreme (or wrong) value barely changes the statistic. Median, quartiles, IQR, MAD use only the **order** of the data, so they are robust; mean, SD, variance, range use the **size** of every value, so one outlier can drag them anywhere. Example: in 12 scores, mistyping 94 as 940 moves the mean from 66 to 136.5 and $s$ from 11.86 to 253, while the median stays 65 and the IQR stays 13.5.
+
 **Spread**
 | Measure | Formula |
 |---|---|
@@ -94,6 +96,31 @@ $X\sim N(\mu,\sigma^2)$: density $\frac1{\sigma\sqrt{2\pi}}e^{-(x-\mu)^2/(2\sigm
 **Standardization**
 $$Z=\frac{X-\mu}\sigma\sim N(0,1),\qquad P(X\le x)=\Phi\!\left(\frac{x-\mu}\sigma\right),\qquad\Phi(-z)=1-\Phi(z).$$
 For data: the **z-score** $z_i=\frac{x_i-\bar x}{s}$ says how many SDs a value is from the mean.
+
+**What $\Phi\!\left(\frac{x-\mu}\sigma\right)$ means, piece by piece**
+1. $\frac{x-\mu}\sigma=z$: "how many SDs is $x$ above the mean?" (negative = below). Example: $\mu=100,\sigma=15,x=130$ ⇒ $z=\frac{30}{15}=2$.
+2. $\Phi(z)=P(Z\le z)$ = the **area under the standard bell curve to the left of $z$** = the share of the population below $z$. It is the CDF of $N(0,1)$, the number the table gives you. $\Phi(2)=0.9772$: 97.72% lie below 2 SDs above the mean.
+3. Why it works: subtracting $\mu$ and dividing by $\sigma$ only re-labels the axis, so the area stays the same. **One table ($N(0,1)$) serves every normal distribution.** Hence $P(X\le130)=\Phi(2)=0.9772$.
+
+![Phi on the IQ example: one bell with an IQ axis and a z axis, area 0.9772 left of 130 (z = 2); the CDF read-off of Phi(2)](images/08-statistics/16-phi-iq-example.png)
+
+**Reading the picture (IQ $\sim N(100,15^2)$, $x=130$):**
+- **Left panel, the bell.** It is *one* curve with *two* axes. The black axis is IQ, the blue axis is $z$. Every IQ tick sits exactly over its $z$ value: $100\to0$, $115\to1$, $130\to2$. That is all $\frac{x-\mu}\sigma$ does. Subtracting $100$ moves the centre to $0$, and dividing by $15$ makes one SD equal one unit. The curve and the shaded area do not change.
+- **The blue arrows** are the SD steps. From $100$ you need two steps of $15$ to reach $130$, so $z=2$.
+- **Blue area** = share of people with IQ $\le130$ = $P(Z\le2)=\Phi(2)=0.9772$. **Orange tail** = the rest, $1-0.9772=0.0228$ (about 2.3% score above 130).
+- **Right panel, the $\Phi$ curve.** $\Phi$ is the running total of the bell's area from the left (the CDF). Start at $z=2$ on the horizontal axis, go up to the curve, then read across: $0.9772$. A $\Phi$ table gives you this number without the graph.
+
+**Recipe:** (1) find $z=\frac{x-\mu}\sigma$; (2) look up $\Phi(z)$ = area to the left; (3) for "more than", use $1-\Phi(z)$.
+
+**The three cases you will meet** (always standardize first: $a'=\frac{a-\mu}\sigma$, $b'=\frac{b-\mu}\sigma$)
+| Want | Formula | Picture |
+|---|---|---|
+| $P(X\le a)$ | $\Phi(a')$ | area left of $a'$ |
+| $P(X>a)$ | $1-\Phi(a')$ | total area 1 minus left part |
+| $P(a<X<b)$ | $\Phi(b')-\Phi(a')$ | left of $b'$ minus left of $a'$ |
+| negative $z$ | $\Phi(-z)=1-\Phi(z)$ | symmetry: tables list only $z\ge0$ |
+
+(For continuous $X$, $\le$ and $<$ give the same probability.) Worked on a dataset with pictures: [08-statistics-example.md §3.2](08-statistics-example.md#32-probabilities-with-a-normal-model-what-φ-means).
 
 | $z$ | 0 | 0.5 | 1 | 1.28 | 1.5 | 1.645 | 1.96 | 2 | 2.326 | 2.576 | 3 |
 |---|---|---|---|---|---|---|---|---|---|---|---|
